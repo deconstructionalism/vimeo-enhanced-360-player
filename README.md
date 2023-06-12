@@ -66,15 +66,3 @@ npm run start
 Contributions to the Vimeo Enhanced 360 Player are welcome! If you have any bug reports, feature requests, or suggestions, please open an issue on the [GitHub repository](https://github.com/deconstructionalism/vimeo-no-code-video-player/issues).
 
 If you would like to contribute code, please fork the repository and create a pull request with your changes. Ensure that your code adheres to the existing code style and is well-documented.
-
-## License
-
-This project is licensed under the [MIT License](https://github.com/deconstructionalism/vimeo-no-code-video-player/blob/main/LICENSE). Feel free to use, modify, and distribute this library as per the terms of the license.
-
-## Acknowledgments
-
-The Vimeo Enhanced 360 Player is inspired by the [Vimeo Player API](https://github.com/vimeo/player.js) and aims to simplify the integration of Vimeo videos into websites without requiring any coding knowledge.
-
-## Contact
-
-If you have any questions, suggestions, or feedback, please feel free to contact the project maintainer at [deconstructionalism@gmail.com](mailto:deconstructionalism@gmail.com).
