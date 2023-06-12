@@ -16,7 +16,7 @@ window.onload = () => {
   // Add styles to ensure responsive videos are actually full width
   const styles = `
     /* ensure responsive videos are really full width */
-    div.vimeo-video-root[data-responsive="true"] > div {
+    div.vimeo-video-root[data-vimeo-responsive="true"] > div {
       padding: 50% 0 0 0!important;
     }
 
