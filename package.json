@@ -24,11 +24,13 @@
   },
   "homepage": "https://github.com/deconstructionalism/vimeo-no-code-video-player#readme",
   "devDependencies": {
+    "@rollup/plugin-terser": "^0.4.3",
     "prettier": "2.8.8",
     "rollup": "^3.25.0",
     "rollup-plugin-livereload": "^2.0.5",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-serve": "^2.0.2",
+    "rollup-plugin-sourcemaps": "^0.6.3",
     "rollup-plugin-typescript2": "^0.34.1",
     "tslib": "^2.5.3",
     "tslint": "^6.1.3",

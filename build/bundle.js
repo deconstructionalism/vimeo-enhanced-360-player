@@ -3619,6 +3619,7 @@
               // Add event listeners to the overlay
               eventOverlay.addEventListener("mousedown", this._handleMouseDown);
               eventOverlay.addEventListener("mouseup", this._handleMouseUp);
+              eventOverlay.addEventListener("wheel", this._handleWheel);
               return eventOverlay;
           };
           /**
@@ -3637,6 +3638,35 @@
                   startingX: event.clientX,
                   startingY: event.clientY,
               };
+          });
+          this._handleWheel = (event) => __awaiter(this, void 0, void 0, function* () {
+              event.preventDefault();
+              const { width, height } = this.element.getBoundingClientRect();
+              const xPositionRange = {
+                  min: this.state.startingX - width * 0.25,
+                  max: this.state.startingX + width * 0.25,
+              };
+              const yPositionRange = {
+                  min: this.state.startingY - height * 0.25,
+                  max: this.state.startingY + height * 0.25,
+              };
+              const xRange = { min: 0, max: 360 };
+              const yRange = { min: -90, max: 90 };
+              const generateTransform = (positionRange, range) => {
+                  return (value) => {
+                      return (((value - positionRange.min) /
+                          (positionRange.max - positionRange.min)) *
+                          (range.max - range.min) +
+                          range.min);
+                  };
+              };
+              const xTransform = generateTransform(xPositionRange, xRange);
+              const yTransform = generateTransform(yPositionRange, yRange);
+              const deltaX = xTransform(this.state.startingX + event.deltaX);
+              const deltaY = yTransform(this.state.startingY + event.deltaY);
+              const boundedDeltaX = Math.max(Math.min(deltaX, xRange.max), xRange.min);
+              const boundedDeltaY = Math.max(Math.min(deltaY, yRange.max), yRange.min);
+              this.moveCamera(boundedDeltaX, -boundedDeltaY);
           });
           this._handleMouseMove = (event) => __awaiter(this, void 0, void 0, function* () {
               const { width, height } = this.element.getBoundingClientRect();
