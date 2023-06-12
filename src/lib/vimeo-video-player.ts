@@ -21,7 +21,7 @@ const renderVideoPlayer = (element: HTMLElement): Player => {
   // to see if we should manually track the mouse movement
   if (
     element.dataset.vimeoBackground === "true" &&
-    element.dataset.custom_backgroundcontrol === "true"
+    element.dataset.vimeoBackgroundEnhanced === "true"
   ) {
     const _ = new VimeoManualMouseTracker(element, player);
   }

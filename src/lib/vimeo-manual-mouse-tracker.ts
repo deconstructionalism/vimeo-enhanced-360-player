@@ -46,8 +46,8 @@ class VimeoManualMouseTracker {
 
     await this.player.setCameraProps({
       ...cameraProps,
-      yaw: cameraProps.yaw + deltaX,
-      pitch: cameraProps.pitch - deltaY,
+      yaw: deltaX,
+      pitch: deltaY,
     });
   };
 
@@ -89,6 +89,7 @@ class VimeoManualMouseTracker {
     this.eventOverlay.addEventListener("mousemove", this._handleMouseMove);
 
     // Store the starting position of the mouse
+    const cameraProps = await this.player.getCameraProps();
     this.state = {
       startingX: event.clientX,
       startingY: event.clientY,
@@ -98,28 +99,43 @@ class VimeoManualMouseTracker {
   _handleMouseMove = async (event: MouseEvent) => {
     const { width, height } = this.element.getBoundingClientRect();
 
-    const maxX = width * 0.75;
-    const minX = width * 0.25;
-    const maxY = height * 0.75;
-    const minY = height * 0.25;
+    type Range = { min: number; max: number };
 
-    // const generateTransform = (minActual, maxActual, minTarget, maxTarget) => {
-    //   const slope = (maxTarget - minTarget) / (maxActual - minActual);
-    //   const intercept = maxTarget - slope * maxActual;
+    const xPositionRange: Range = {
+      min: this.state.startingX - width * 0.25,
+      max: this.state.startingX + width * 0.25,
+    };
+    const yPositionRange: Range = {
+      min: this.state.startingY - height * 0.25,
+      max: this.state.startingY + height * 0.25,
+    };
+    const xRange: Range = { min: 0, max: 360 };
+    const yRange: Range = { min: -90, max: 90 };
 
-    //   return (x) => slope * x + intercept;
-    // };
+    const generateTransform = (
+      positionRange: Range,
+      range: Range
+    ): ((value: number) => number) => {
+      return (value: number) => {
+        return (
+          ((value - positionRange.min) /
+            (positionRange.max - positionRange.min)) *
+            (range.max - range.min) +
+          range.min
+        );
+      };
+    };
 
-    // const xTransform = generateTransform(minX, maxX, 0, 360);
-    // const yTransform = generateTransform(minY, maxY, -90, 90);
+    const xTransform = generateTransform(xPositionRange, xRange);
+    const yTransform = generateTransform(yPositionRange, yRange);
 
-    const deltaX = event.clientX - this.state.startingX;
-    const deltaY = event.clientY - this.state.startingX;
+    const deltaX = xTransform(event.clientX);
+    const deltaY = yTransform(event.clientY);
 
-    // const boundedDeltaX = Math.max(Math.min(deltaX, maxX), minX)
-    // const boundedDeltaY = Math.max(Math.min(deltaY, maxY), minY)
+    const boundedDeltaX = Math.max(Math.min(deltaX, xRange.max), xRange.min);
+    const boundedDeltaY = Math.max(Math.min(deltaY, yRange.max), yRange.min);
 
-    this.moveCamera(deltaX, deltaY);
+    this.moveCamera(boundedDeltaX, -boundedDeltaY);
   };
 
   /**
