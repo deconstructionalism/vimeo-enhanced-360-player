@@ -18,7 +18,7 @@ To use the Vimeo Enhanced 360 Player in your project, follow these steps:
 1. Add a reference to the script in the `head` tag of your HTML file:
 
    ```html
-   <script src="path/to/vimeo-no-code-video-player.js"></script>
+   <script src="https://cdn.statically.io/gh/deconstructionalism/vimeo-enhanced-360-player/main/build/bundle.js"></script>
    ```
 
 ## Usage
