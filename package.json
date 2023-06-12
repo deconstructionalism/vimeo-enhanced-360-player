@@ -5,6 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "npx rollup --watch --config ./rollup.config.js",
+    "build": "BUILD=1 npx rollup --config ./rollup.config.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "npx tslint --config ./tslint.json --project ./tsconfig.json --fix",
     "format": "npx prettier --no-config --write src/**/*.ts"
