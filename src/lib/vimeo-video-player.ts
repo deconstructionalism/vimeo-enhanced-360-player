@@ -86,8 +86,13 @@ const renderVideoPlayer = async (element: HTMLElement): Promise<Player> => {
     addLoadingImage(element, element.dataset.vimeoLoadingImageUrl);
   }
 
+  console.log('1')
+
   // Create a new Vimeo player instance
   const player = new Player(element);
+
+  console.log('2')
+
 
   // Set camera props for 360 video if they were passed
   if (
@@ -96,6 +101,9 @@ const renderVideoPlayer = async (element: HTMLElement): Promise<Player> => {
   ) {
     await setCameraProps(player, element);
   }
+
+  console.log('3')
+
 
   // If autoplay on background play is enabled, we need to mute the video and play it
   if (
