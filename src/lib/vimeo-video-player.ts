@@ -29,6 +29,19 @@ const checkIfMobileBrowser = (): boolean => {
   );
 };
 
+const setCameraProps = async (
+  player: Player,
+  element: HTMLElement
+): Promise<void> => {
+  try {
+    await player.setCameraProps(
+      JSON.parse(element.dataset.vimeoStartingCameraProps || "")
+    );
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 /**
  * If element has `vimeoLoadingImageUrl` data attribute, add a loading
  * image that shows before video is loaded.
@@ -81,10 +94,7 @@ const renderVideoPlayer = async (element: HTMLElement): Promise<Player> => {
     (await checkIf360Video(player)) &&
     element.dataset.vimeoStartingCameraProps
   ) {
-    const startingCameraProps = JSON.parse(
-      element.dataset.vimeoStartingCameraProps
-    );
-    await player.setCameraProps(startingCameraProps);
+    await setCameraProps(player, element);
   }
 
   // If autoplay on background play is enabled, we need to mute the video and play it
@@ -113,7 +123,7 @@ const renderVideoPlayer = async (element: HTMLElement): Promise<Player> => {
     if (checkIfMobileBrowser()) {
       const { vimeoMobileFallbackId, vimeoMobileFallbackUrl } = element.dataset;
 
-      console.log(vimeoMobileFallbackId, vimeoMobileFallbackUrl, 'mobile')
+      console.log(vimeoMobileFallbackId, vimeoMobileFallbackUrl, "mobile");
 
       if (vimeoMobileFallbackId) {
         await player.loadVideo(vimeoMobileFallbackId);

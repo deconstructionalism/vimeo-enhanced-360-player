@@ -3802,6 +3802,14 @@
     const checkIfMobileBrowser = () => {
         return /iPhone|iPad|iPod|Android|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     };
+    const setCameraProps = (player, element) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            yield player.setCameraProps(JSON.parse(element.dataset.vimeoStartingCameraProps || ""));
+        }
+        catch (error) {
+            console.error(error);
+        }
+    });
     /**
      * If element has `vimeoLoadingImageUrl` data attribute, add a loading
      * image that shows before video is loaded.
@@ -3848,8 +3856,7 @@
         // Set camera props for 360 video if they were passed
         if ((yield checkIf360Video(player)) &&
             element.dataset.vimeoStartingCameraProps) {
-            const startingCameraProps = JSON.parse(element.dataset.vimeoStartingCameraProps);
-            yield player.setCameraProps(startingCameraProps);
+            yield setCameraProps(player, element);
         }
         // If autoplay on background play is enabled, we need to mute the video and play it
         if (element.dataset.vimeoAutoplay === "true" ||
@@ -3873,7 +3880,7 @@
             // to load a fallback video
             if (checkIfMobileBrowser()) {
                 const { vimeoMobileFallbackId, vimeoMobileFallbackUrl } = element.dataset;
-                console.log(vimeoMobileFallbackId, vimeoMobileFallbackUrl, 'mobile');
+                console.log(vimeoMobileFallbackId, vimeoMobileFallbackUrl, "mobile");
                 if (vimeoMobileFallbackId) {
                     yield player.loadVideo(vimeoMobileFallbackId);
                 }
