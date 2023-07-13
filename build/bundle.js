@@ -3871,6 +3871,7 @@
             });
             yield player.setVolume(0);
             yield player.play();
+            console.log('4.1');
         }
         else {
             console.log('5');
