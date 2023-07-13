@@ -1,14 +1,17 @@
+type ThrottledFunction = (...args: any[]) => Promise<void> | void;
+
 /**
  * Throttle function calls to a given limit.
  *
  * @param func - function to throttle
  * @param limit - limit in milliseconds
+ *
  * @returns throttled function
  */
 const throttle = (
-  func: (...args: any[]) => void | Promise<void>,
+  func: ThrottledFunction,
   limit: number
-): ((...args: any[]) => void | Promise<void>) => {
+): ThrottledFunction => {
   let inThrottle = false;
 
   return (...args) => {

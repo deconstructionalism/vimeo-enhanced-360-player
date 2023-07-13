@@ -2,7 +2,8 @@
 
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/deconstructionalism/vimeo-no-code-video-player/blob/main/LICENSE)
 
-Vimeo Enhanced 360 Player is a lightweight JavaScript library that allows you to embed Vimeo 360 videos into your website without writing any code. This library allows for clean, unobstructed, interactive 360 videos.
+Vimeo Enhanced 360 Player is a lightweight JavaScript library that allows you to embed Vimeo 360 videos into your
+website without writing any code. This library allows for clean, unobstructed, interactive 360 videos.
 
 ## Features
 
@@ -10,6 +11,8 @@ Vimeo Enhanced 360 Player is a lightweight JavaScript library that allows you to
 - Show responsive videos as full width
 - Allow background 360 videos to be interacted with via keyboard and mouse,
   functionality not available out of the box from the Vimeo SDK
+- Handle mobile fallback videos for 360 videos (mobile browsers do not currently support 360 videos)
+- Show a loading image while the video is loading
 
 ## Installation
 
@@ -23,39 +26,78 @@ To use the Vimeo Enhanced 360 Player in your project, follow these steps:
 
 ## Usage
 
-Using the Vimeo Enhanced 360 Player is straightforward. Simply add a `div` element with the class `vimeo-video-player` and set the `data-vimeo-id` or `data-vimeo-url` attribute to the Vimeo video ID or URL, respectively.
+Using the Vimeo Enhanced 360 Player is straightforward. Simply add a `div` element with the class `vimeo-video-root`
+and set the `data-vimeo-id` or `data-vimeo-url` attribute to the Vimeo video ID or URL, respectively.
 
 ```html
-<div class="vimeo-video-player" data-vimeo-id="123456789"></div>
+<div class="vimeo-video-root" data-vimeo-id="123456789"></div>
 ```
 
 ## Options
 
-The Vimeo Enhanced 360 Player provides some optional attributes to further customize the player. Anyattribute described on See [here](https://developer.vimeo.com/player/sdk/embed) for additional attributes and usage information.
- can be included in the div element as an attribute with the format
+The Vimeo Enhanced 360 Player provides some optional attributes to further customize the player. Any attribute described
+[here](https://developer.vimeo.com/player/sdk/embed) can be included in the div element as an attribute with the format:
 `data-vimeo-<attribute-name>="<value>"`.
 
 ```html
-<div class="vimeo-video-player" data-vimeo-id="123456789" data-vimeo-responsive="true"></div>
+<div
+  class="vimeo-video-root"
+  data-vimeo-id="123456789"
+  data-vimeo-responsive="true"
+></div>
+```
+
+## Custom Options
+
+This library also provides some custom attributes beyond what is provided by the Vimeo SDK to further customize the
+player for 360 videos.
+
+### Background Loading Image
+
+You can specify an image to show in the background (including an animated GIF) while the video is loading by passing a
+image url to the `data-vimeo-loading-image-url` attribute:
+```html
+<div
+  class="vimeo-video-root"
+  data-vimeo-id="123456789"
+  data-vimeo-loading-image-url="https://example.com/loading.gif"
+></div>
+```
+
+### 360 Mobile Fallback Video
+
+Most mobile browsers do not currently support rendering 360 Vimeo videos. To provide a fallback video for mobile users,
+you can pass a Vimeo video ID or URL to the `data-vimeo-mobile-fallback-id` or `data-vimeo-mobile-fallback-url`
+attribute:
+
+```html
+<div
+  class="vimeo-video-root"
+  data-vimeo-id="123456789"
+  data-vimeo-mobile-fallback-id="987654321"
+></div>
 ```
 
 ### Enhanced 360 Background Mode
 
-Background mode is a available as a vimeo video attribute (`data-vimeo-background="true"`), which will conveniently remove the central
-play and pause button. However, this mode does not allow you to interact with
-the video at all.
+Background mode is a available as a vimeo video attribute (`data-vimeo-background="true"`), which will conveniently
+remove the central play and pause button. However, this mode does not allow you to interact with the video at all.
 
-By passing `data-vimeo-background-enhanced="true"` along with `data-vimeo-background="true"`,
-you can navigate the 360 video using the keyboard or mouse.
+By passing `data-vimeo-background-enhanced="true"` along with `data-vimeo-background="true"`, you can navigate the 360
+video using mouse via click and drag:
 
 ```html
-<div class="vimeo-video-player" data-vimeo-id="123456789" data-vimeo-background="true" data-vimeo-background-enhanced="true"></div>
+<div
+  class="vimeo-video-root"
+  data-vimeo-id="123456789"
+  data-vimeo-background="true"
+  data-vimeo-background-enhanced="true"
+></div>
 ```
 
 ## Development
 
-You can run a hot-reload server to view a video player
-configured in `index.html` by using the following command:
+You can run a hot-reload server to view a video player configured in `index.html` by using the following command:
 
 ```bash
 npm run start
@@ -63,6 +105,8 @@ npm run start
 
 ## Contributing
 
-Contributions to the Vimeo Enhanced 360 Player are welcome! If you have any bug reports, feature requests, or suggestions, please open an issue on the [GitHub repository](https://github.com/deconstructionalism/vimeo-no-code-video-player/issues).
+Contributions to the Vimeo Enhanced 360 Player are welcome! If you have any bug reports, feature requests, or
+suggestions, please open an issue on the [GitHub repository](https://github.com/deconstructionalism/vimeo-no-code-video-player/issues).
 
-If you would like to contribute code, please fork the repository and create a pull request with your changes. Ensure that your code adheres to the existing code style and is well-documented.
+If you would like to contribute code, please fork the repository and create a pull request with your changes. Ensure
+that your code adheres to the existing code style and is well-documented.
