@@ -3872,7 +3872,12 @@
             console.log('4.1');
             yield player.setVolume(0);
             console.log('4.2');
-            yield player.play();
+            try {
+                yield player.play();
+            }
+            catch (error) {
+                console.log(error);
+            }
             console.log('4.3');
         }
         else {

@@ -120,7 +120,12 @@ const renderVideoPlayer = async (element: HTMLElement): Promise<Player> => {
     await player.setVolume(0);
 
     console.log('4.2')
-    await player.play();
+    try {
+      await player.play();
+
+    } catch (error) {
+      console.log(error)
+    }
 
     console.log('4.3')
 
