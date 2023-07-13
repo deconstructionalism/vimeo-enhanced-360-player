@@ -3864,6 +3864,7 @@
         // If autoplay on background play is enabled, we need to mute the video and play it
         if (element.dataset.vimeoAutoplay === "true" ||
             element.dataset.vimeoBackground === "true") {
+            console.log('4');
             // Add `vimeo-video-root--loaded` class to element when video plays
             player.on("play", () => {
                 element.classList.add("vimeo-video-root--loaded");
@@ -3872,6 +3873,7 @@
             yield player.play();
         }
         else {
+            console.log('5');
             // Add `vimeo-video-root--loaded` class to element when video is loaded
             player.on("loaded", () => {
                 element.classList.add("vimeo-video-root--loaded");
@@ -3879,6 +3881,7 @@
         }
         // Handle 360 videos
         if (yield checkIf360Video(player)) {
+            console.log('6');
             // On mobile devices, 360 videos are not supported and we should attempt
             // to load a fallback video
             if (checkIfMobileBrowser()) {
@@ -3897,9 +3900,11 @@
             }
             else if (element.dataset.vimeoBackground === "true" &&
                 element.dataset.vimeoBackgroundEnhanced === "true") {
+                console.log('7');
                 new VimeoCameraInputTracker(element, player);
             }
         }
+        console.log('8');
         return player;
     });
 
