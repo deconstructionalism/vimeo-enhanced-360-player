@@ -3873,6 +3873,7 @@
             // to load a fallback video
             if (checkIfMobileBrowser()) {
                 const { vimeoMobileFallbackId, vimeoMobileFallbackUrl } = element.dataset;
+                console.log(vimeoMobileFallbackId, vimeoMobileFallbackUrl, 'mobile');
                 if (vimeoMobileFallbackId) {
                     yield player.loadVideo(vimeoMobileFallbackId);
                 }
