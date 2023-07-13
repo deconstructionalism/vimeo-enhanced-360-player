@@ -13,6 +13,7 @@ website without writing any code. This library allows for clean, unobstructed, i
   functionality not available out of the box from the Vimeo SDK
 - Handle mobile fallback videos for 360 videos (mobile browsers do not currently support 360 videos)
 - Show a loading image while the video is loading
+- Start 360 video with custom camera yaw, pitch, roll, and FOV
 
 ## Installation
 
@@ -21,7 +22,7 @@ To use the Vimeo Enhanced 360 Player in your project, follow these steps:
 1. Add a reference to the script in the `head` tag of your HTML file:
 
    ```html
-   <script src="https://cdn.statically.io/gh/deconstructionalism/vimeo-enhanced-360-player/main/build/bundle.min.js"></script>
+   <script src="https://cdn.statically.io/gh/deconstructionalism/vimeo-enhanced-360-player/main/v.10/build/bundle.min.js"></script>
    ```
 
 ## Usage
@@ -78,6 +79,19 @@ attribute:
 ></div>
 ```
 
+### 360 Starting Camera Props
+
+You can specify the starting camera position and rotation for 360 videos by passing a JSON string to the
+`data-vimeo-starting-camera-props` attribute:
+
+```html
+<div
+  class="vimeo-video-root"
+  data-vimeo-id="123456789"
+  data-vimeo-starting-camera-props='{"yaw": 180, "pitch": 0, "roll": 0, "fov": 45}'
+></div>
+```
+
 ### Enhanced 360 Background Mode
 
 Background mode is a available as a vimeo video attribute (`data-vimeo-background="true"`), which will conveniently
@@ -101,6 +115,24 @@ You can run a hot-reload server to view a video player configured in `index.html
 
 ```bash
 npm run start
+```
+
+You can lint the code using the following command:
+
+```bash
+npm run lint
+```
+
+You can format the code using the following command:
+
+```bash
+npm run format
+```
+
+You can build the code using the following command:
+
+```bash
+npm run build
 ```
 
 ## Contributing

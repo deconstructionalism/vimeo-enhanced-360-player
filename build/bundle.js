@@ -3845,6 +3845,12 @@
         }
         // Create a new Vimeo player instance
         const player = new Player(element);
+        // Set camera props for 360 video if they were passed
+        if ((yield checkIf360Video(player)) &&
+            element.dataset.vimeoStartingCameraProps) {
+            const startingCameraProps = JSON.parse(element.dataset.vimeoStartingCameraProps);
+            yield player.setCameraProps(startingCameraProps);
+        }
         // If autoplay on background play is enabled, we need to mute the video and play it
         if (element.dataset.vimeoAutoplay === "true" ||
             element.dataset.vimeoBackground === "true") {
