@@ -3869,9 +3869,11 @@
             player.on("play", () => {
                 element.classList.add("vimeo-video-root--loaded");
             });
-            yield player.setVolume(0);
-            yield player.play();
             console.log('4.1');
+            yield player.setVolume(0);
+            console.log('4.2');
+            yield player.play();
+            console.log('4.3');
         }
         else {
             console.log('5');

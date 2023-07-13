@@ -115,11 +115,15 @@ const renderVideoPlayer = async (element: HTMLElement): Promise<Player> => {
     player.on("play", () => {
       element.classList.add("vimeo-video-root--loaded");
     });
+    console.log('4.1')
 
     await player.setVolume(0);
+
+    console.log('4.2')
     await player.play();
 
-    console.log('4.1')
+    console.log('4.3')
+
   } else {
     console.log('5')
     // Add `vimeo-video-root--loaded` class to element when video is loaded
