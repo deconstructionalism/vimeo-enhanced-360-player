@@ -1,5 +1,3 @@
-
-(function(l, r) { if (!l || l.getElementById('livereloadscript')) return; r = l.createElement('script'); r.async = 1; r.src = '//' + (self.location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1'; r.id = 'livereloadscript'; l.getElementsByTagName('head')[0].appendChild(r) })(self.document);
 (function () {
     'use strict';
 
@@ -3848,7 +3846,8 @@
         // Create a new Vimeo player instance
         const player = new Player(element);
         // If autoplay on background play is enabled, we need to mute the video and play it
-        if (element.dataset.vimeoAutoplay === "true" || element.dataset.vimeoBackground === "true") {
+        if (element.dataset.vimeoAutoplay === "true" ||
+            element.dataset.vimeoBackground === "true") {
             // Add `vimeo-video-root--loaded` class to element when video plays
             player.on("play", () => {
                 element.classList.add("vimeo-video-root--loaded");
