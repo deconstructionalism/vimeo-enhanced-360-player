@@ -29,19 +29,6 @@ const checkIfMobileBrowser = (): boolean => {
   );
 };
 
-const setCameraProps = async (
-  player: Player,
-  element: HTMLElement
-): Promise<void> => {
-  try {
-    await player.setCameraProps(
-      JSON.parse(element.dataset.vimeoStartingCameraProps || "")
-    );
-  } catch (error) {
-    console.error(error);
-  }
-};
-
 /**
  * If element has `vimeoLoadingImageUrl` data attribute, add a loading
  * image that shows before video is loaded.
@@ -86,89 +73,56 @@ const renderVideoPlayer = async (element: HTMLElement): Promise<Player> => {
     addLoadingImage(element, element.dataset.vimeoLoadingImageUrl);
   }
 
-  console.log('1')
-
   // Create a new Vimeo player instance
   const player = new Player(element);
 
-  console.log('2')
+  // On mobile devices, we should attempt to load a fallback video if provided
+  if (checkIfMobileBrowser()) {
+    const { vimeoMobileFallbackId, vimeoMobileFallbackUrl } = element.dataset;
 
-
-  // Set camera props for 360 video if they were passed
-  if (
-    (await checkIf360Video(player)) &&
-    element.dataset.vimeoStartingCameraProps
-  ) {
-    await setCameraProps(player, element);
+    if (vimeoMobileFallbackId) {
+      await player.loadVideo(vimeoMobileFallbackId);
+    } else if (vimeoMobileFallbackUrl) {
+      await player.loadVideo(vimeoMobileFallbackUrl);
+    }
   }
 
-  console.log('3')
+  // Handle 360 videos
+  if (await checkIf360Video(player)) {
+    // Add custom mouse tracking to background videos so
+    // we can still navigate the video even when all the controls
+    // are hidden
+    if (
+      element.dataset.vimeoBackground === "true" &&
+      element.dataset.vimeoBackgroundEnhanced === "true"
+    ) {
+      const _ = new VimeoCameraInputTracker(element, player);
+    }
 
+    // Set camera props for 360 video if they were passed
+    if (element.dataset.vimeoStartingCameraProps) {
+      await player.setCameraProps(
+        JSON.parse(element.dataset.vimeoStartingCameraProps || "")
+      );
+    }
+  }
 
   // If autoplay on background play is enabled, we need to mute the video and play it
   if (
     element.dataset.vimeoAutoplay === "true" ||
     element.dataset.vimeoBackground === "true"
   ) {
-    console.log('4')
     // Add `vimeo-video-root--loaded` class to element when video plays
     player.on("play", () => {
       element.classList.add("vimeo-video-root--loaded");
     });
-    console.log('4.1')
-
     await player.setVolume(0);
-
-    console.log('4.2')
-    try {
-      await player.play();
-
-    } catch (error) {
-      console.log(error)
-    }
-
-    console.log('4.3')
-
   } else {
-    console.log('5')
     // Add `vimeo-video-root--loaded` class to element when video is loaded
     player.on("loaded", () => {
       element.classList.add("vimeo-video-root--loaded");
     });
   }
-
-  // Handle 360 videos
-  if (await checkIf360Video(player)) {
-
-    console.log('6')
-    // On mobile devices, 360 videos are not supported and we should attempt
-    // to load a fallback video
-    if (checkIfMobileBrowser()) {
-      const { vimeoMobileFallbackId, vimeoMobileFallbackUrl } = element.dataset;
-
-      console.log(vimeoMobileFallbackId, vimeoMobileFallbackUrl, "mobile");
-
-      if (vimeoMobileFallbackId) {
-        await player.loadVideo(vimeoMobileFallbackId);
-      } else if (vimeoMobileFallbackUrl) {
-        await player.loadVideo(vimeoMobileFallbackUrl);
-      }
-      return player;
-
-      // On desktop devices, we should add custom mouse tracking
-      // to baclground videos so we can still navigate the video
-      // even when all the controls are hidden
-    } else if (
-      element.dataset.vimeoBackground === "true" &&
-      element.dataset.vimeoBackgroundEnhanced === "true"
-    ) {
-
-      console.log('7')
-      const _ = new VimeoCameraInputTracker(element, player);
-    }
-  }
-
-  console.log('8')
 
   return player;
 };
