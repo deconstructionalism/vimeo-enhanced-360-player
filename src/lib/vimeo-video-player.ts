@@ -80,15 +80,10 @@ const renderVideoPlayer = async (element: HTMLElement): Promise<Player> => {
   if (checkIfMobileBrowser()) {
     const { vimeoMobileFallbackId, vimeoMobileFallbackUrl } = element.dataset;
 
-    console.log('isMobile')
-    console.log(player)
-
     if (vimeoMobileFallbackId) {
       await player.loadVideo(vimeoMobileFallbackId);
-      console.log('vimeoMobileFallbackId')
     } else if (vimeoMobileFallbackUrl) {
       await player.loadVideo(vimeoMobileFallbackUrl);
-      console.log('vimeoMobileFallbackUrl')
     }
   }
 

@@ -3848,15 +3848,11 @@
         // On mobile devices, we should attempt to load a fallback video if provided
         if (checkIfMobileBrowser()) {
             const { vimeoMobileFallbackId, vimeoMobileFallbackUrl } = element.dataset;
-            console.log('isMobile');
-            console.log(player);
             if (vimeoMobileFallbackId) {
                 yield player.loadVideo(vimeoMobileFallbackId);
-                console.log('vimeoMobileFallbackId');
             }
             else if (vimeoMobileFallbackUrl) {
                 yield player.loadVideo(vimeoMobileFallbackUrl);
-                console.log('vimeoMobileFallbackUrl');
             }
         }
         // Handle 360 videos
