@@ -3849,6 +3849,7 @@
         if (checkIfMobileBrowser()) {
             const { vimeoMobileFallbackId, vimeoMobileFallbackUrl } = element.dataset;
             console.log('isMobile');
+            console.log(player);
             if (vimeoMobileFallbackId) {
                 yield player.loadVideo(vimeoMobileFallbackId);
                 console.log('vimeoMobileFallbackId');
