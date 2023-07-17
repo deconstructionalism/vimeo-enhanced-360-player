@@ -1,5 +1,6 @@
 import Player from "@vimeo/player";
 import { renderVideoPlayer } from "./lib/vimeo-video-player";
+import { appendStyle } from "./lib/document-helpers";
 
 // Add `vimeoPlayers` to the global window object
 declare global {
@@ -12,17 +13,11 @@ declare global {
  * Loads the Vimeo player API and sets up all Vimeo video root elements on the page.
  */
 window.onload = async () => {
-
-  // Add styles to ensure responsive videos are actually full width
-  const styles = `
+  // Add styles to the page for the Vimeo video root elements
+  appendStyle(`
     /* ensures overlays for loading images and mouse tracking match size of video */
     div.vimeo-video-root {
       position: relative;
-    }
-
-    /* ensure responsive videos are really full width */
-    div.vimeo-video-root[data-vimeo-responsive="true"] > div {
-      padding: 50% 0 0 0!important;
     }
 
     /* change cursor for grab state */
@@ -49,13 +44,12 @@ window.onload = async () => {
         display: none;
       }
     }
-  `;
-  const styleSheet = document.createElement("style");
-  styleSheet.innerText = styles;
-  document.head.appendChild(styleSheet);
+  `);
 
   // Find all Vimeo video root elements on the page
-  const videoRoots = [...document.querySelectorAll<HTMLElement>("div.vimeo-video-root")];
+  const videoRoots = [
+    ...document.querySelectorAll<HTMLElement>("div.vimeo-video-root"),
+  ];
 
   // Render a Vimeo player in each element and store the players in a global variable
   // `window.vimeoPlayers` can be used to further control the players using external code

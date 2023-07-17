@@ -6,7 +6,7 @@ class MinMaxRange {
 
   /**
    * A numeric range with a minimum and maximum value and current index,
-   * than handles circularranges as well.
+   * than handles circular ranges as well.
    *
    * @param min - minimum value of range
    * @param max - maximum value of range

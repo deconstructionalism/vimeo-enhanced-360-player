@@ -1,5 +1,6 @@
 import Player from "@vimeo/player";
 import { VimeoCameraInputTracker } from "./vimeo-camera-input-tracker";
+import { appendStyle, checkIfMobileBrowser } from "./document-helpers";
 
 /**
  * Checks if the given Vimeo player is playing 360 video.
@@ -16,17 +17,6 @@ const checkIf360Video = async (player: Player): Promise<boolean> => {
   }
 
   return true;
-};
-
-/**
- * Checks if the current browser is a mobile browser.
- *
- * @returns whether or not the current browser is a mobile browser
- */
-const checkIfMobileBrowser = (): boolean => {
-  return /iPhone|iPad|iPod|Android|BlackBerry|IEMobile|Opera Mini/i.test(
-    navigator.userAgent
-  );
 };
 
 /**
@@ -112,11 +102,25 @@ const renderVideoPlayer = async (element: HTMLElement): Promise<Player> => {
     element.dataset.vimeoAutoplay === "true" ||
     element.dataset.vimeoBackground === "true"
   ) {
+    const width = await player.getVideoWidth();
+    const height = await player.getVideoHeight();
+
+    // Add styles to make sure background videos are full width and height
+    appendStyle(`
+      /* ensure background videos are really full width */
+      div.vimeo-video-root[data-vimeo-responsive="true"] > div {
+        height: calc(${(height / width) * 100}vw);
+        max-width: calc(${(width / height) * 100}vh);
+        padding: unset !important;
+      }
+    `);
+
     // Add `vimeo-video-root--loaded` class to element when video plays
     player.on("play", () => {
       element.classList.add("vimeo-video-root--loaded");
     });
     await player.setVolume(0);
+    await player.play();
   } else {
     // Add `vimeo-video-root--loaded` class to element when video is loaded
     player.on("loaded", () => {

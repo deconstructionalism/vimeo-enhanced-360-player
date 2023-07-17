@@ -3580,7 +3580,7 @@
     class MinMaxRange {
         /**
          * A numeric range with a minimum and maximum value and current index,
-         * than handles circularranges as well.
+         * than handles circular ranges as well.
          *
          * @param min - minimum value of range
          * @param max - maximum value of range
@@ -3779,6 +3779,25 @@
     }
 
     /**
+     * Appends a style element to the document head with the given css.
+     *
+     * @param css - css to append to the document
+     */
+    const appendStyle = (css) => {
+        const styleSheet = document.createElement("style");
+        styleSheet.innerText = css;
+        document.head.appendChild(styleSheet);
+    };
+    /**
+     * Checks if the current browser is a mobile browser.
+     *
+     * @returns whether or not the current browser is a mobile browser
+     */
+    const checkIfMobileBrowser = () => {
+        return /iPhone|iPad|iPod|Android|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    };
+
+    /**
      * Checks if the given Vimeo player is playing 360 video.
      *
      * @param player - Vimeo player instance to check
@@ -3794,14 +3813,6 @@
         }
         return true;
     });
-    /**
-     * Checks if the current browser is a mobile browser.
-     *
-     * @returns whether or not the current browser is a mobile browser
-     */
-    const checkIfMobileBrowser = () => {
-        return /iPhone|iPad|iPod|Android|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    };
     /**
      * If element has `vimeoLoadingImageUrl` data attribute, add a loading
      * image that shows before video is loaded.
@@ -3872,11 +3883,23 @@
         // If autoplay on background play is enabled, we need to mute the video and play it
         if (element.dataset.vimeoAutoplay === "true" ||
             element.dataset.vimeoBackground === "true") {
+            const width = yield player.getVideoWidth();
+            const height = yield player.getVideoHeight();
+            // Add styles to make sure background videos are full width and height
+            appendStyle(`
+      /* ensure background videos are really full width */
+      div.vimeo-video-root[data-vimeo-responsive="true"] > div {
+        height: calc(${(height / width) * 100}vw);
+        max-width: calc(${(width / height) * 100}vh);
+        padding: unset !important;
+      }
+    `);
             // Add `vimeo-video-root--loaded` class to element when video plays
             player.on("play", () => {
                 element.classList.add("vimeo-video-root--loaded");
             });
             yield player.setVolume(0);
+            yield player.play();
         }
         else {
             // Add `vimeo-video-root--loaded` class to element when video is loaded
@@ -3891,16 +3914,11 @@
      * Loads the Vimeo player API and sets up all Vimeo video root elements on the page.
      */
     window.onload = () => __awaiter(void 0, void 0, void 0, function* () {
-        // Add styles to ensure responsive videos are actually full width
-        const styles = `
+        // Add styles to the page for the Vimeo video root elements
+        appendStyle(`
     /* ensures overlays for loading images and mouse tracking match size of video */
     div.vimeo-video-root {
       position: relative;
-    }
-
-    /* ensure responsive videos are really full width */
-    div.vimeo-video-root[data-vimeo-responsive="true"] > div {
-      padding: 50% 0 0 0!important;
     }
 
     /* change cursor for grab state */
@@ -3927,12 +3945,11 @@
         display: none;
       }
     }
-  `;
-        const styleSheet = document.createElement("style");
-        styleSheet.innerText = styles;
-        document.head.appendChild(styleSheet);
+  `);
         // Find all Vimeo video root elements on the page
-        const videoRoots = [...document.querySelectorAll("div.vimeo-video-root")];
+        const videoRoots = [
+            ...document.querySelectorAll("div.vimeo-video-root"),
+        ];
         // Render a Vimeo player in each element and store the players in a global variable
         // `window.vimeoPlayers` can be used to further control the players using external code
         const players = yield Promise.all(videoRoots.map(renderVideoPlayer));
