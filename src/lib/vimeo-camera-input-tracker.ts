@@ -16,7 +16,7 @@ class VimeoCameraInputTracker {
   dragData: { xRange: MinMaxRange; yRange: MinMaxRange };
 
   /**
-   * Tracks click and drag mouse movement or arrow key presse and moves the camera of the given
+   * Tracks click and drag mouse movement or arrow key press and moves the camera of the given
    * Vimeo player accordingly.
    *
    * Meant to accommodate videos with `data-background` set to `true`
@@ -169,7 +169,7 @@ class VimeoCameraInputTracker {
    * @param event - keydown event
    */
   handleKeyDown = (event: KeyboardEvent): void => {
-    // If the event overlay is not focused or arrow keys are not pressedm, do nothing
+    // If the event overlay is not focused or arrow keys are not pressed, do nothing
     if (
       !(document.activeElement === this.eventOverlay) ||
       !["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"].includes(event.key)

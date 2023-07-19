@@ -11,13 +11,22 @@ const appendStyle = (css: string): void => {
 
 /**
  * Checks if the current browser is a mobile browser.
+ * Will append a custom class to the body if it is a mobile browser.
  *
  * @returns whether or not the current browser is a mobile browser
  */
 const checkIfMobileBrowser = (): boolean => {
-  return /iPhone|iPad|iPod|Android|BlackBerry|IEMobile|Opera Mini/i.test(
-    navigator.userAgent
-  );
+  const isMobile =
+    /iPhone|iPad|iPod|Android|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
+
+  // Add class to body if mobile browser
+  if (isMobile) {
+    document.body.classList.add("vimeo-enhanced-360-player--mobile-browser");
+  }
+
+  return isMobile;
 };
 
 export { appendStyle, checkIfMobileBrowser };

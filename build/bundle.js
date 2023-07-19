@@ -1,3 +1,5 @@
+
+(function(l, r) { if (!l || l.getElementById('livereloadscript')) return; r = l.createElement('script'); r.async = 1; r.src = '//' + (self.location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1'; r.id = 'livereloadscript'; l.getElementsByTagName('head')[0].appendChild(r) })(self.document);
 (function () {
     'use strict';
 
@@ -3636,7 +3638,7 @@
     const KEY_PRESS_INCREMENT = 5;
     class VimeoCameraInputTracker {
         /**
-         * Tracks click and drag mouse movement or arrow key presse and moves the camera of the given
+         * Tracks click and drag mouse movement or arrow key press and moves the camera of the given
          * Vimeo player accordingly.
          *
          * Meant to accommodate videos with `data-background` set to `true`
@@ -3741,7 +3743,7 @@
              * @param event - keydown event
              */
             this.handleKeyDown = (event) => {
-                // If the event overlay is not focused or arrow keys are not pressedm, do nothing
+                // If the event overlay is not focused or arrow keys are not pressed, do nothing
                 if (!(document.activeElement === this.eventOverlay) ||
                     !["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"].includes(event.key)) {
                     return;
@@ -3790,11 +3792,17 @@
     };
     /**
      * Checks if the current browser is a mobile browser.
+     * Will append a custom class to the body if it is a mobile browser.
      *
      * @returns whether or not the current browser is a mobile browser
      */
     const checkIfMobileBrowser = () => {
-        return /iPhone|iPad|iPod|Android|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const isMobile = /iPhone|iPad|iPod|Android|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        // Add class to body if mobile browser
+        if (isMobile) {
+            document.body.classList.add("vimeo-enhanced-360-player--mobile-browser");
+        }
+        return isMobile;
     };
 
     /**
@@ -3818,15 +3826,18 @@
      * image that shows before video is loaded.
      *
      * @param element - element to add background image to
-     * @param imgUrl - url where loading image is located
      */
-    const addLoadingImage = (element, imgUrl) => {
+    const addLoadingImage = (element) => {
+        // If element does not have `vimeoLoadingImageUrl` data attribute, do nothing
+        if (element.dataset.vimeoLoadingImageUrl === undefined) {
+            return;
+        }
         const id = `vimeo-video-root-${crypto.randomUUID()}`;
         element.id = id;
         const styles = `
     /* add loading image */
     div.vimeo-video-root#${element.id}::after {
-      background-image: url(${imgUrl});
+      background-image: url(${element.dataset.vimeoLoadingImageUrl});
       background-size: cover;
       background-repeat: no-repeat;
       background-position: center;
@@ -3843,17 +3854,37 @@
         document.head.appendChild(styleSheet);
     };
     /**
+     * Handles the `loaded` and `play` events for a Vimeo player by adding
+     * a class to the element and body.
+     *
+     * @param player - Vimeo player to track
+     * @param element - element containing the Vimeo player
+     * @param index - index of the element in the list of vimeo player element
+     *                       to render.
+     */
+    const handleVideoLoadOrPlay = (player, element, index) => {
+        /**
+         * Handles the `loaded` and `play` events for a Vimeo player by adding
+         * a class to the element and body.
+         * @param type - type of event to handle
+         */
+        const handler = (type) => {
+            element.classList.add(`vimeo-video-root--${type}`);
+            document.body.classList.add(`vimeo-enhanced-360-player--${type}-player-${index}`);
+        };
+        // Add event listeners to the player
+        player.on("play", handler.bind(null, "playing"));
+        player.on("loaded", handler.bind(null, "loaded"));
+    };
+    /**
      * Renders a Vimeo player in the given element using options passed as data attributes.
      *
      * @param element - element to render the Vimeo player in
+     * @param index - index of the element in the list of elements to render
      *
      * @returns player instance
      */
-    const renderVideoPlayer = (element) => __awaiter(void 0, void 0, void 0, function* () {
-        // If `vimeoLoadingImageUrl` data attribute is present, add a loading image
-        if (element.dataset.vimeoLoadingImageUrl) {
-            addLoadingImage(element, element.dataset.vimeoLoadingImageUrl);
-        }
+    const renderVideoPlayer = (element, index) => __awaiter(void 0, void 0, void 0, function* () {
         // Create a new Vimeo player instance
         const player = new Player(element);
         // On mobile devices, we should attempt to load a fallback video if provided
@@ -3861,34 +3892,29 @@
             const { vimeoMobileFallbackId, vimeoMobileFallbackUrl } = element.dataset;
             if (vimeoMobileFallbackId) {
                 yield player.loadVideo(vimeoMobileFallbackId);
-                console.log('loaded id');
             }
             else if (vimeoMobileFallbackUrl) {
                 yield player.loadVideo(vimeoMobileFallbackUrl);
-                console.log('loaded url');
             }
         }
         // Handle 360 videos
         if (yield checkIf360Video(player)) {
-            console.log('is 360');
             // Add custom mouse tracking to background videos so
             // we can still navigate the video even when all the controls
             // are hidden
             if (element.dataset.vimeoBackground === "true" &&
                 element.dataset.vimeoBackgroundEnhanced === "true") {
-                console.log('tracking');
                 new VimeoCameraInputTracker(element, player);
             }
             // Set camera props for 360 video if they were passed
             if (element.dataset.vimeoStartingCameraProps) {
-                console.log('setting camera props');
                 yield player.setCameraProps(JSON.parse(element.dataset.vimeoStartingCameraProps || ""));
             }
         }
+        handleVideoLoadOrPlay(player, element, index);
         // If autoplay on background play is enabled, we need to mute the video and play it
         if (element.dataset.vimeoAutoplay === "true" ||
             element.dataset.vimeoBackground === "true") {
-            console.log('autoplay');
             const width = yield player.getVideoWidth();
             const height = yield player.getVideoHeight();
             // Add styles to make sure background videos are full width and height
@@ -3900,26 +3926,19 @@
         padding: unset !important;
       }
     `);
-            // Add `vimeo-video-root--loaded` class to element when video plays
-            player.on("play", () => {
-                console.log('playing');
-                element.classList.add("vimeo-video-root--loaded");
-            });
+            // add a loading image if provided, must happen after the above styles
+            // are added to avoid ugly resizing of loading graphic
+            addLoadingImage(element);
             yield player.setVolume(0);
+            // redundant reload of video seems to be required for mobile to autoplay
             const videoId = yield player.getVideoId();
             yield player.loadVideo(videoId);
             yield player.play();
-            console.log('play now');
         }
         else {
-            console.log('not autoplay');
-            // Add `vimeo-video-root--loaded` class to element when video is loaded
-            player.on("loaded", () => {
-                console.log('loaded');
-                element.classList.add("vimeo-video-root--loaded");
-            });
+            // add a loading image if provided
+            addLoadingImage(element);
         }
-        console.log('returning player');
         return player;
     });
 

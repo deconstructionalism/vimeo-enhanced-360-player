@@ -8,12 +8,16 @@ website without writing any code. This library allows for clean, unobstructed, i
 ## Features
 
 - Embed Vimeo videos without writing any code
-- Show responsive videos as full width
+- Show responsive videos as full width on both mobile and desktop
 - Allow background 360 videos to be interacted with via keyboard and mouse,
   functionality not available out of the box from the Vimeo SDK
-- Handle mobile fallback videos for 360 videos (mobile browsers do not currently support 360 videos)
+- Handle mobile fallback videos to load on mobile only
+  - this can be useful as mobile browsers do not currently support 360 videos
 - Show a loading image while the video is loading
 - Start 360 video with custom camera yaw, pitch, roll, and FOV
+- Add a CSS class to body when a mobile browser is detected for easy styling
+- Automatically append loading and play status as css classes both to the vimeo video root element and the
+  body element for easy styling
 
 ## Installation
 
@@ -33,6 +37,26 @@ and set the `data-vimeo-id` or `data-vimeo-url` attribute to the Vimeo video ID 
 ```html
 <div class="vimeo-video-root" data-vimeo-id="123456789"></div>
 ```
+
+## Mobile Browser Detection
+
+This library will detect if the user is on a mobile browser and will append a
+`vimeo-enhanced-360-player--mobile-browser` class to the `body` element if so.
+
+## On Video Load or Play
+
+This library will try and load all vimeo players on the page when the page loads in the order they appear
+in the html.
+
+When a video loads:
+
+- the `body` element will get a `vimeo-enhanced-360-player--loaded-player-<index>` class
+- the `vimeo-video-root` element at that index will get a `vimeo-video-root--loaded` class
+
+When a video starts playing:
+
+- the `body` element will get a `vimeo-enhanced-360-player--playing-player-<index>` class
+- the `vimeo-video-root` element at that index will get a `vimeo-video-root--playing` class
 
 ## Options
 
@@ -57,6 +81,7 @@ player for 360 videos.
 
 You can specify an image to show in the background (including an animated GIF) while the video is loading by passing a
 image url to the `data-vimeo-loading-image-url` attribute:
+
 ```html
 <div
   class="vimeo-video-root"
@@ -65,7 +90,7 @@ image url to the `data-vimeo-loading-image-url` attribute:
 ></div>
 ```
 
-### 360 Mobile Fallback Video
+### Mobile Fallback Video
 
 Most mobile browsers do not currently support rendering 360 Vimeo videos. To provide a fallback video for mobile users,
 you can pass a Vimeo video ID or URL to the `data-vimeo-mobile-fallback-id` or `data-vimeo-mobile-fallback-url`
