@@ -3861,11 +3861,11 @@
             const { vimeoMobileFallbackId, vimeoMobileFallbackUrl } = element.dataset;
             if (vimeoMobileFallbackId) {
                 yield player.loadVideo(vimeoMobileFallbackId);
-                console.log('loaded');
+                console.log('loaded id');
             }
             else if (vimeoMobileFallbackUrl) {
                 yield player.loadVideo(vimeoMobileFallbackUrl);
-                console.log('loaded');
+                console.log('loaded url');
             }
         }
         // Handle 360 videos
@@ -3902,15 +3902,18 @@
     `);
             // Add `vimeo-video-root--loaded` class to element when video plays
             player.on("play", () => {
+                console.log('playing');
                 element.classList.add("vimeo-video-root--loaded");
             });
             yield player.setVolume(0);
             yield player.play();
+            console.log('play now');
         }
         else {
             console.log('not autoplay');
             // Add `vimeo-video-root--loaded` class to element when video is loaded
             player.on("loaded", () => {
+                console.log('loaded');
                 element.classList.add("vimeo-video-root--loaded");
             });
         }

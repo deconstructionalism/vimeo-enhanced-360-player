@@ -72,10 +72,10 @@ const renderVideoPlayer = async (element: HTMLElement): Promise<Player> => {
 
     if (vimeoMobileFallbackId) {
       await player.loadVideo(vimeoMobileFallbackId);
-      console.log('loaded')
+      console.log('loaded id')
     } else if (vimeoMobileFallbackUrl) {
       await player.loadVideo(vimeoMobileFallbackUrl);
-      console.log('loaded')
+      console.log('loaded url')
     }
   }
 
@@ -123,14 +123,17 @@ const renderVideoPlayer = async (element: HTMLElement): Promise<Player> => {
 
     // Add `vimeo-video-root--loaded` class to element when video plays
     player.on("play", () => {
+      console.log('playing')
       element.classList.add("vimeo-video-root--loaded");
     });
     await player.setVolume(0);
     await player.play();
+    console.log('play now')
   } else {
     console.log('not autoplay')
     // Add `vimeo-video-root--loaded` class to element when video is loaded
     player.on("loaded", () => {
+      console.log('loaded')
       element.classList.add("vimeo-video-root--loaded");
     });
   }
