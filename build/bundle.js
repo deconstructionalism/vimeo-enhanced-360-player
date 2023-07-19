@@ -3906,6 +3906,8 @@
                 element.classList.add("vimeo-video-root--loaded");
             });
             yield player.setVolume(0);
+            const videoId = yield player.getVideoId();
+            yield player.loadVideo(videoId);
             yield player.play();
             console.log('play now');
         }

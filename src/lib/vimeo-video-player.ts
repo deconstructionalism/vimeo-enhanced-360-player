@@ -127,6 +127,8 @@ const renderVideoPlayer = async (element: HTMLElement): Promise<Player> => {
       element.classList.add("vimeo-video-root--loaded");
     });
     await player.setVolume(0);
+    const videoId = await player.getVideoId();
+    await player.loadVideo(videoId);
     await player.play();
     console.log('play now')
   } else {
