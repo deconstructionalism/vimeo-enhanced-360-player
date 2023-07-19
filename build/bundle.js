@@ -3861,28 +3861,34 @@
             const { vimeoMobileFallbackId, vimeoMobileFallbackUrl } = element.dataset;
             if (vimeoMobileFallbackId) {
                 yield player.loadVideo(vimeoMobileFallbackId);
+                console.log('loaded');
             }
             else if (vimeoMobileFallbackUrl) {
                 yield player.loadVideo(vimeoMobileFallbackUrl);
+                console.log('loaded');
             }
         }
         // Handle 360 videos
         if (yield checkIf360Video(player)) {
+            console.log('is 360');
             // Add custom mouse tracking to background videos so
             // we can still navigate the video even when all the controls
             // are hidden
             if (element.dataset.vimeoBackground === "true" &&
                 element.dataset.vimeoBackgroundEnhanced === "true") {
+                console.log('tracking');
                 new VimeoCameraInputTracker(element, player);
             }
             // Set camera props for 360 video if they were passed
             if (element.dataset.vimeoStartingCameraProps) {
+                console.log('setting camera props');
                 yield player.setCameraProps(JSON.parse(element.dataset.vimeoStartingCameraProps || ""));
             }
         }
         // If autoplay on background play is enabled, we need to mute the video and play it
         if (element.dataset.vimeoAutoplay === "true" ||
             element.dataset.vimeoBackground === "true") {
+            console.log('autoplay');
             const width = yield player.getVideoWidth();
             const height = yield player.getVideoHeight();
             // Add styles to make sure background videos are full width and height
@@ -3902,11 +3908,13 @@
             yield player.play();
         }
         else {
+            console.log('not autoplay');
             // Add `vimeo-video-root--loaded` class to element when video is loaded
             player.on("loaded", () => {
                 element.classList.add("vimeo-video-root--loaded");
             });
         }
+        console.log('returning player');
         return player;
     });
 

@@ -72,13 +72,16 @@ const renderVideoPlayer = async (element: HTMLElement): Promise<Player> => {
 
     if (vimeoMobileFallbackId) {
       await player.loadVideo(vimeoMobileFallbackId);
+      console.log('loaded')
     } else if (vimeoMobileFallbackUrl) {
       await player.loadVideo(vimeoMobileFallbackUrl);
+      console.log('loaded')
     }
   }
 
   // Handle 360 videos
   if (await checkIf360Video(player)) {
+    console.log('is 360')
     // Add custom mouse tracking to background videos so
     // we can still navigate the video even when all the controls
     // are hidden
@@ -86,11 +89,13 @@ const renderVideoPlayer = async (element: HTMLElement): Promise<Player> => {
       element.dataset.vimeoBackground === "true" &&
       element.dataset.vimeoBackgroundEnhanced === "true"
     ) {
+      console.log('tracking')
       const _ = new VimeoCameraInputTracker(element, player);
     }
 
     // Set camera props for 360 video if they were passed
     if (element.dataset.vimeoStartingCameraProps) {
+      console.log('setting camera props')
       await player.setCameraProps(
         JSON.parse(element.dataset.vimeoStartingCameraProps || "")
       );
@@ -102,6 +107,7 @@ const renderVideoPlayer = async (element: HTMLElement): Promise<Player> => {
     element.dataset.vimeoAutoplay === "true" ||
     element.dataset.vimeoBackground === "true"
   ) {
+    console.log('autoplay')
     const width = await player.getVideoWidth();
     const height = await player.getVideoHeight();
 
@@ -122,11 +128,14 @@ const renderVideoPlayer = async (element: HTMLElement): Promise<Player> => {
     await player.setVolume(0);
     await player.play();
   } else {
+    console.log('not autoplay')
     // Add `vimeo-video-root--loaded` class to element when video is loaded
     player.on("loaded", () => {
       element.classList.add("vimeo-video-root--loaded");
     });
   }
+
+  console.log('returning player')
 
   return player;
 };
