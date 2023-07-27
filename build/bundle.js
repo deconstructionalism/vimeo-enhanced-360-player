@@ -3920,7 +3920,7 @@
       /* ensure background videos are really full width */
       div.vimeo-video-root[data-vimeo-responsive="true"] > div {
         height: calc(${(height / width) * 100}vw);
-        // max-width: calc(${(width / height) * 100}vh);
+        max-width: 100vw;
         padding: unset !important;
       }
     `);
