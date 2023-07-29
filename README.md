@@ -16,8 +16,7 @@ website without writing any code. This library allows for clean, unobstructed, i
 - Show a loading image while the video is loading
 - Start 360 video with custom camera yaw, pitch, roll, and FOV
 - Add a CSS class to body when a mobile browser is detected for easy styling
-- Automatically append loading and play status as css classes both to the vimeo video root element and the
-  body element for easy styling
+- Emit custom events from players that can be listened to via JavaScript
 
 ## Installation
 
@@ -43,20 +42,30 @@ and set the `data-vimeo-id` or `data-vimeo-url` attribute to the Vimeo video ID 
 This library will detect if the user is on a mobile browser and will append a
 `vimeo-enhanced-360-player--mobile-browser` class to the `body` element if so.
 
-## On Video Load or Play
+## Player Events
 
-This library will try and load all vimeo players on the page when the page loads in the order they appear
-in the html.
+When any [player events](https://developer.vimeo.com/player/sdk/reference) occur,
+this library will emit a custom event that will bubble up through the DOM.
 
-When a video loads:
+The custom event name will be `vimeo-enhanced-360-player-<event-name>`, where
+`<event-name>` is the name of the player event documented in the link above.
 
-- the `body` element will get a `vimeo-enhanced-360-player--loaded-player-<index>` class
-- the `vimeo-video-root` element at that index will get a `vimeo-video-root--loaded` class
+For example, this autoplay video will emit a `vimeo-enhanced-360-player-playing` event
+when it starts playing, which can then be caught in a parent element such as `document`:
 
-When a video starts playing:
+```html
+<div
+  class="vimeo-video-root"
+  data-vimeo-id="123456789"
+  data-vimeo-autoplay="true"
+></div>
 
-- the `body` element will get a `vimeo-enhanced-360-player--playing-player-<index>` class
-- the `vimeo-video-root` element at that index will get a `vimeo-video-root--playing` class
+<script>
+  document.addEventListener('vimeo-enhanced-360-player-playing', () => {
+    alert('The video is playing!')
+  })
+</script>
+```
 
 ## Options
 
@@ -152,6 +161,12 @@ You can format the code using the following command:
 
 ```bash
 npm run format
+```
+
+You can test the code using the following command:
+
+```bash
+npm run test
 ```
 
 You can build the code using the following command:

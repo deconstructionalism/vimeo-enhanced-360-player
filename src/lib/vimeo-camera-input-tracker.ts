@@ -209,4 +209,4 @@ class VimeoCameraInputTracker {
   };
 }
 
-export { VimeoCameraInputTracker };
+export default VimeoCameraInputTracker;

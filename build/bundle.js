@@ -1,4 +1,4 @@
-(function () {
+(function (exports) {
     'use strict';
 
     /******************************************************************************
@@ -27,6 +27,10 @@
             step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
     }
+
+    var global$1 = (typeof global !== "undefined" ? global :
+      typeof self !== "undefined" ? self :
+      typeof window !== "undefined" ? window : {});
 
     /*! @vimeo/player v2.20.1 | (c) 2023 Vimeo | MIT License | https://github.com/vimeo/player.js */
     function ownKeys(object, enumerableOnly) {
@@ -553,7 +557,7 @@
      * @type {Boolean}
      */
     /* global global */
-    var isNode = typeof global !== 'undefined' && {}.toString.call(global) === '[object global]';
+    var isNode = typeof global$1 !== 'undefined' && {}.toString.call(global$1) === '[object global]';
 
     /**
      * Get the name of the method for a given getter or setter.
@@ -673,7 +677,7 @@
       throw new Error('Sorry, the Vimeo Player API is not available in this browser.');
     }
 
-    var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+    var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global$1 !== 'undefined' ? global$1 : typeof self !== 'undefined' ? self : {};
 
     function createCommonjsModule(fn, module) {
     	return module = { exports: {} }, fn(module, module.exports), module.exports;
@@ -3589,6 +3593,10 @@
          */
         constructor(min, max, circular = false, current = null) {
             this._current = Infinity;
+            if (min >= max)
+                throw new Error("min must be less than max");
+            if (current !== null && (current < min || current > max))
+                throw new Error("current must be within range");
             this.min = min;
             this.max = max;
             this.circular = circular;
@@ -3785,9 +3793,19 @@
      */
     const appendStyle = (css) => {
         const styleSheet = document.createElement("style");
-        styleSheet.innerText = css;
+        styleSheet.innerHTML = css;
         document.head.appendChild(styleSheet);
     };
+    // List of mobile browser user agents
+    const mobileBrowserUserAgents = [
+        "iPhone",
+        "iPad",
+        "iPod",
+        "Android",
+        "BlackBerry",
+        "IEMobile",
+        "Opera Mini",
+    ];
     /**
      * Checks if the current browser is a mobile browser.
      * Will append a custom class to the body if it is a mobile browser.
@@ -3795,7 +3813,7 @@
      * @returns whether or not the current browser is a mobile browser
      */
     const checkIfMobileBrowser = () => {
-        const isMobile = /iPhone|iPad|iPod|Android|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const isMobile = new RegExp(mobileBrowserUserAgents.join("|"), "i").test(navigator.userAgent);
         // Add class to body if mobile browser
         if (isMobile) {
             document.body.classList.add("vimeo-enhanced-360-player--mobile-browser");
@@ -3803,6 +3821,62 @@
         return isMobile;
     };
 
+    var crypto = {};
+
+    // The event types for a Vimeo player
+    const eventTypes = (() => {
+        // ensure that every event type in `EventMap` is accounted for,
+        // otherwise will give compile-time TS errors
+        const EventKeys = {
+            play: true,
+            playing: true,
+            pause: true,
+            ended: true,
+            timeupdate: true,
+            progress: true,
+            seeking: true,
+            seeked: true,
+            texttrackchange: true,
+            chapterchange: true,
+            cuechange: true,
+            cuepoint: true,
+            volumechange: true,
+            playbackratechange: true,
+            bufferstart: true,
+            bufferend: true,
+            error: true,
+            loaded: true,
+            durationchange: true,
+            fullscreenchange: true,
+            qualitychange: true,
+            camerachange: true,
+            resize: true,
+            enterpictureinpicture: true,
+            leavepictureinpicture: true,
+        };
+        return Object.keys(EventKeys);
+    })();
+    /**
+     * Adds event listeners that emit custom bubbling events for the given Vimeo
+     * player.
+     *
+     * The custom events are of the form `vimeo-enhanced-360-player-${eventType}`,
+     * and contain the original Vimeo player event in `detail`.
+     *
+     * @param player - Vimeo player instance to add event listeners to
+     * @param element - element containing Vimeo player
+     */
+    const addEventEmitters = (player, element) => {
+        // Add event listeners to the player
+        eventTypes.forEach((eventType) => {
+            // listen for player events
+            player.on(eventType, (event) => {
+                // Emit custom event that bubbles up
+                const customEvent = new CustomEvent(`vimeo-enhanced-360-player-${eventType}`, { bubbles: true, detail: event });
+                element.dispatchEvent(customEvent);
+            });
+        });
+    };
     /**
      * Checks if the given Vimeo player is playing 360 video.
      *
@@ -3821,11 +3895,13 @@
     });
     /**
      * If element has `vimeoLoadingImageUrl` data attribute, add a loading
-     * image that shows before video is loaded.
+     * image that shows before video is loaded or auto-played.
      *
+     * @param player - Vimeo player instance to add event listeners to
      * @param element - element to add background image to
+     * @param willAutoPlay - whether or not video will autoplay
      */
-    const addLoadingImage = (element) => {
+    const addLoadingImage = (player, element, willAutoPlay) => {
         // If element does not have `vimeoLoadingImageUrl` data attribute, do nothing
         if (element.dataset.vimeoLoadingImageUrl === undefined) {
             return;
@@ -3850,39 +3926,23 @@
         const styleSheet = document.createElement("style");
         styleSheet.innerText = styles;
         document.head.appendChild(styleSheet);
+        // fade loading image when video is playing or loaded
+        if (willAutoPlay) {
+            player.on("playing", () => element.classList.add("vimeo-video-root--loaded"));
+        }
+        else {
+            player.on("loaded", () => element.classList.add("vimeo-video-root--loaded"));
+        }
     };
-    /**
-     * Handles the `loaded` and `play` events for a Vimeo player by adding
-     * a class to the element and body.
-     *
-     * @param player - Vimeo player to track
-     * @param element - element containing the Vimeo player
-     * @param index - index of the element in the list of vimeo player element
-     *                       to render.
-     */
-    const handleVideoLoadOrPlay = (player, element, index) => {
-        /**
-         * Handles the `loaded` and `play` events for a Vimeo player by adding
-         * a class to the element and body.
-         * @param type - type of event to handle
-         */
-        const handler = (type) => {
-            element.classList.add(`vimeo-video-root--${type}`);
-            document.body.classList.add(`vimeo-enhanced-360-player--${type}-player-${index}`);
-        };
-        // Add event listeners to the player
-        player.on("play", handler.bind(null, "playing"));
-        player.on("loaded", handler.bind(null, "loaded"));
-    };
+
     /**
      * Renders a Vimeo player in the given element using options passed as data attributes.
      *
      * @param element - element to render the Vimeo player in
-     * @param index - index of the element in the list of elements to render
      *
      * @returns player instance
      */
-    const renderVideoPlayer = (element, index) => __awaiter(void 0, void 0, void 0, function* () {
+    const renderVideoPlayer = (element) => __awaiter(void 0, void 0, void 0, function* () {
         // Create a new Vimeo player instance
         const player = new Player(element);
         // On mobile devices, we should attempt to load a fallback video if provided
@@ -3906,16 +3966,17 @@
             }
             // Set camera props for 360 video if they were passed
             if (element.dataset.vimeoStartingCameraProps) {
-                yield player.setCameraProps(JSON.parse(element.dataset.vimeoStartingCameraProps || ""));
+                player.on("playing", () => {
+                    player.setCameraProps(JSON.parse(element.dataset.vimeoStartingCameraProps || ""));
+                });
             }
         }
-        handleVideoLoadOrPlay(player, element, index);
-        // If autoplay on background play is enabled, we need to mute the video and play it
-        if (element.dataset.vimeoAutoplay === "true" ||
-            element.dataset.vimeoBackground === "true") {
+        // If video is responsive, we need to add some styles to make sure it
+        // is full width
+        if (element.dataset.vimeoResponsive === "true") {
             const width = yield player.getVideoWidth();
             const height = yield player.getVideoHeight();
-            // Add styles to make sure background videos are full width and height
+            // Add styles to make sure background videos are full width
             appendStyle(`
       /* ensure background videos are really full width */
       div.vimeo-video-root[data-vimeo-responsive="true"] > div {
@@ -3924,9 +3985,15 @@
         padding: unset !important;
       }
     `);
-            // add a loading image if provided, must happen after the above styles
-            // are added to avoid ugly resizing of loading graphic
-            addLoadingImage(element);
+        }
+        // Add event emitters to the player
+        addEventEmitters(player, element);
+        // If autoplay or background play is enabled, we need to mute the video and play it
+        if (element.dataset.vimeoAutoplay === "true" ||
+            element.dataset.vimeoBackground === "true") {
+            // add a loading image if provided
+            addLoadingImage(player, element, true);
+            // mute video
             yield player.setVolume(0);
             // redundant reload of video seems to be required for mobile to autoplay
             const videoId = yield player.getVideoId();
@@ -3935,7 +4002,7 @@
         }
         else {
             // add a loading image if provided
-            addLoadingImage(element);
+            addLoadingImage(player, element, false);
         }
         return player;
     });
@@ -3943,39 +4010,38 @@
     /**
      * Loads the Vimeo player API and sets up all Vimeo video root elements on the page.
      */
-    window.onload = () => __awaiter(void 0, void 0, void 0, function* () {
+    const load = () => __awaiter(void 0, void 0, void 0, function* () {
         // Add styles to the page for the Vimeo video root elements
         appendStyle(`
-    /* ensures overlays for loading images and mouse tracking match size of video */
-    div.vimeo-video-root {
-      position: relative;
-    }
+   /* ensures overlays for loading images and mouse tracking match size of video */
+   div.vimeo-video-root {
+     position: relative;
+   }
 
-    /* change cursor for grab state */
-    div.vimeo-video-root > div.vimeo-video-root__event-overlay {
-      cursor: grab;
-    }
+   /* change cursor for grab state */
+   div.vimeo-video-root > div.vimeo-video-root__event-overlay {
+     cursor: grab;
+   }
 
-    div.vimeo-video-root > div.vimeo-video-root__event-overlay.dragging {
-      cursor: grabbing;
-    }
+   div.vimeo-video-root > div.vimeo-video-root__event-overlay.dragging {
+     cursor: grabbing;
+   }
 
-    /* fade out loading image if one was provided when video starts playing or is loaded */
-    div.vimeo-video-root.vimeo-video-root--loaded::after {
-      animation: vimeo-video-root__loading-animation 0.5s ease-in-out forwards;
-    }
+   /* fade out loading image if one was provided when video starts playing or is loaded */
+   div.vimeo-video-root.vimeo-video-root--loaded::after {
+     animation: vimeo-video-root__loading-animation 0.5s ease-in-out forwards;
+   }
 
-    @keyframes vimeo-video-root__loading-animation {
-      0% {
-        opacity: 1;
-        display: block;
-      }
-      100% {
-        opacity: 0;
-        display: none;
-      }
-    }
-  `);
+   @keyframes vimeo-video-root__loading-animation {
+     0% {
+       opacity: 1;
+     }
+     100% {
+       opacity: 0;
+       visibility: hidden;
+     }
+   }
+ `);
         // Find all Vimeo video root elements on the page
         const videoRoots = [
             ...document.querySelectorAll("div.vimeo-video-root"),
@@ -3985,5 +4051,10 @@
         const players = yield Promise.all(videoRoots.map(renderVideoPlayer));
         window.vimeoPlayers = players;
     });
+    window.onload = load;
 
-})();
+    exports.load = load;
+
+    return exports;
+
+})({});

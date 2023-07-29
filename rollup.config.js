@@ -4,6 +4,7 @@ const serve = require('rollup-plugin-serve')
 const typescript = require('rollup-plugin-typescript2')
 const terser = require('@rollup/plugin-terser')
 const sourcemaps = require('rollup-plugin-sourcemaps')
+const nodePolyfills = require('rollup-plugin-polyfill-node')
 
 const options = [{
   input: 'src/index.ts',
@@ -12,8 +13,11 @@ const options = [{
     format: 'iife',
   },
   plugins: [
-    resolve(),
+    resolve({
+      preferBuiltins: true
+    }),
     typescript(),
+    nodePolyfills(),
     ...(process.env.BUILD !== '1' ? [livereload(), serve()] : [])
   ],
 }]
@@ -27,8 +31,10 @@ if (process.env.BUILD === '1') {
       format: 'iife',
     },
     plugins: [
-      resolve(),
-      typescript({sourceMap: true, inlineSources: true}),
+      resolve({
+        preferBuiltins: true
+      }),
+      typescript({ sourceMap: true, inlineSources: true }),
       sourcemaps(),
       terser()
     ]

@@ -5,9 +5,20 @@
  */
 const appendStyle = (css: string): void => {
   const styleSheet = document.createElement("style");
-  styleSheet.innerText = css;
+  styleSheet.innerHTML = css;
   document.head.appendChild(styleSheet);
 };
+
+// List of mobile browser user agents
+const mobileBrowserUserAgents: string[] = [
+  "iPhone",
+  "iPad",
+  "iPod",
+  "Android",
+  "BlackBerry",
+  "IEMobile",
+  "Opera Mini",
+];
 
 /**
  * Checks if the current browser is a mobile browser.
@@ -16,10 +27,9 @@ const appendStyle = (css: string): void => {
  * @returns whether or not the current browser is a mobile browser
  */
 const checkIfMobileBrowser = (): boolean => {
-  const isMobile =
-    /iPhone|iPad|iPod|Android|BlackBerry|IEMobile|Opera Mini/i.test(
-      navigator.userAgent
-    );
+  const isMobile = new RegExp(mobileBrowserUserAgents.join("|"), "i").test(
+    navigator.userAgent
+  );
 
   // Add class to body if mobile browser
   if (isMobile) {
@@ -29,4 +39,4 @@ const checkIfMobileBrowser = (): boolean => {
   return isMobile;
 };
 
-export { appendStyle, checkIfMobileBrowser };
+export { appendStyle, checkIfMobileBrowser, mobileBrowserUserAgents };

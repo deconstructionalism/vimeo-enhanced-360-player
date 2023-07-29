@@ -19,6 +19,10 @@ class MinMaxRange {
     circular = false,
     current: number | null = null
   ) {
+    if (min >= max) throw new Error("min must be less than max");
+    if (current !== null && (current < min || current > max))
+      throw new Error("current must be within range");
+
     this.min = min;
     this.max = max;
     this.circular = circular;
