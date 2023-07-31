@@ -31,8 +31,8 @@ class VimeoCameraInputTracker {
     this.player = player;
     this.eventOverlay = this.addEventOverlay();
     this.dragData = {
-      xRange: new MinMaxRange(0, 0),
-      yRange: new MinMaxRange(0, 0),
+      xRange: new MinMaxRange(0, 1),
+      yRange: new MinMaxRange(0, 1),
     };
 
     // Set moveCamera to a throttled version of _moveCamera, with higher latency if

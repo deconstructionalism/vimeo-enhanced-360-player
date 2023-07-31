@@ -14,7 +14,6 @@ website without writing any code. This library allows for clean, unobstructed, i
 - Handle mobile fallback videos to load on mobile only
   - this can be useful as mobile browsers do not currently support 360 videos
 - Show a loading image while the video is loading
-- Start 360 video with custom camera yaw, pitch, roll, and FOV
 - Add a CSS class to body when a mobile browser is detected for easy styling
 - Emit custom events from players that can be listened to via JavaScript
 
@@ -110,19 +109,6 @@ attribute:
   class="vimeo-video-root"
   data-vimeo-id="123456789"
   data-vimeo-mobile-fallback-id="987654321"
-></div>
-```
-
-### 360 Starting Camera Props
-
-You can specify the starting camera position and rotation for 360 videos by passing a JSON string to the
-`data-vimeo-starting-camera-props` attribute:
-
-```html
-<div
-  class="vimeo-video-root"
-  data-vimeo-id="123456789"
-  data-vimeo-starting-camera-props='{"yaw": 180, "pitch": 0, "roll": 0, "fov": 45}'
 ></div>
 ```
 

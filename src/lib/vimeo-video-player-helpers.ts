@@ -1,5 +1,44 @@
 import Player, { EventMap } from "@vimeo/player";
-import crypto from "crypto";
+import { appendStyle } from "./document-helpers";
+
+// HELPER FUNCTIONS
+
+/**
+ * Generates a v4 UUID.
+ *
+ * @returns a v4 UUID
+ */
+const uuid = (): `${string}-${string}-${string}-${string}-${string}` => {
+  // generate v4 UUID part
+  const s4 = (): string =>
+    Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);
+
+  return `${s4()}${s4()}-${s4()}-${s4()}-${s4()}-${s4()}`;
+};
+
+/**
+ * Adds a loading image to the given element.
+ *
+ * @param element - The element to add the loading image to
+ * @returns CSS to add the loading image to the element
+ */
+const generateLoadingImageStyleCSS = (element: HTMLElement): string => `
+/* add loading image */
+div.vimeo-video-root#${element.id}::after {
+  background-image: url(${element.dataset.vimeoLoadingImageUrl});
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  bottom: 0;
+  content: "";
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+`;
 
 // The event types for a Vimeo player
 const eventTypes = ((): string[] => {
@@ -96,27 +135,10 @@ const addLoadingImage = (
     return;
   }
 
-  const id = `vimeo-video-root-${crypto.randomUUID()}`;
+  const id = `vimeo-video-root-${uuid()}`;
   element.id = id;
 
-  const styles = `
-    /* add loading image */
-    div.vimeo-video-root#${element.id}::after {
-      background-image: url(${element.dataset.vimeoLoadingImageUrl});
-      background-size: cover;
-      background-repeat: no-repeat;
-      background-position: center;
-      bottom: 0;
-      content: "";
-      left: 0;
-      position: absolute;
-      top: 0;
-      width: 100%;
-    }
-  `;
-  const styleSheet = document.createElement("style");
-  styleSheet.innerText = styles;
-  document.head.appendChild(styleSheet);
+  appendStyle(generateLoadingImageStyleCSS(element));
 
   // fade loading image when video is playing or loaded
   if (willAutoPlay) {
@@ -130,4 +152,11 @@ const addLoadingImage = (
   }
 };
 
-export { addEventEmitters, addLoadingImage, checkIf360Video, eventTypes };
+export {
+  addEventEmitters,
+  addLoadingImage,
+  checkIf360Video,
+  eventTypes,
+  generateLoadingImageStyleCSS,
+  uuid,
+};

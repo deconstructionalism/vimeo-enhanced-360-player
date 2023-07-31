@@ -1,4 +1,6 @@
-(function (exports) {
+
+(function(l, r) { if (!l || l.getElementById('livereloadscript')) return; r = l.createElement('script'); r.async = 1; r.src = '//' + (self.location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1'; r.id = 'livereloadscript'; l.getElementsByTagName('head')[0].appendChild(r) })(self.document);
+var bundle = (function (exports) {
     'use strict';
 
     /******************************************************************************
@@ -27,10 +29,6 @@
             step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
     }
-
-    var global$1 = (typeof global !== "undefined" ? global :
-      typeof self !== "undefined" ? self :
-      typeof window !== "undefined" ? window : {});
 
     /*! @vimeo/player v2.20.1 | (c) 2023 Vimeo | MIT License | https://github.com/vimeo/player.js */
     function ownKeys(object, enumerableOnly) {
@@ -557,7 +555,7 @@
      * @type {Boolean}
      */
     /* global global */
-    var isNode = typeof global$1 !== 'undefined' && {}.toString.call(global$1) === '[object global]';
+    var isNode = typeof global !== 'undefined' && {}.toString.call(global) === '[object global]';
 
     /**
      * Get the name of the method for a given getter or setter.
@@ -677,7 +675,7 @@
       throw new Error('Sorry, the Vimeo Player API is not available in this browser.');
     }
 
-    var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global$1 !== 'undefined' ? global$1 : typeof self !== 'undefined' ? self : {};
+    var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
     function createCommonjsModule(fn, module) {
     	return module = { exports: {} }, fn(module, module.exports), module.exports;
@@ -3775,8 +3773,8 @@
             this.player = player;
             this.eventOverlay = this.addEventOverlay();
             this.dragData = {
-                xRange: new MinMaxRange(0, 0),
-                yRange: new MinMaxRange(0, 0),
+                xRange: new MinMaxRange(0, 1),
+                yRange: new MinMaxRange(0, 1),
             };
             // Set moveCamera to a throttled version of _moveCamera, with higher latency if
             // browser is firefox since firefox is very laggy in handling mousemove events
@@ -3821,8 +3819,38 @@
         return isMobile;
     };
 
-    var crypto = {};
-
+    // HELPER FUNCTIONS
+    /**
+     * Generates a v4 UUID.
+     *
+     * @returns a v4 UUID
+     */
+    const uuid = () => {
+        // generate v4 UUID part
+        const s4 = () => Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+        return `${s4()}${s4()}-${s4()}-${s4()}-${s4()}-${s4()}`;
+    };
+    /**
+     * Adds a loading image to the given element.
+     *
+     * @param element - The element to add the loading image to
+     * @returns CSS to add the loading image to the element
+     */
+    const generateLoadingImageStyleCSS = (element) => `
+/* add loading image */
+div.vimeo-video-root#${element.id}::after {
+  background-image: url(${element.dataset.vimeoLoadingImageUrl});
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  bottom: 0;
+  content: "";
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+`;
     // The event types for a Vimeo player
     const eventTypes = (() => {
         // ensure that every event type in `EventMap` is accounted for,
@@ -3906,26 +3934,9 @@
         if (element.dataset.vimeoLoadingImageUrl === undefined) {
             return;
         }
-        const id = `vimeo-video-root-${crypto.randomUUID()}`;
+        const id = `vimeo-video-root-${uuid()}`;
         element.id = id;
-        const styles = `
-    /* add loading image */
-    div.vimeo-video-root#${element.id}::after {
-      background-image: url(${element.dataset.vimeoLoadingImageUrl});
-      background-size: cover;
-      background-repeat: no-repeat;
-      background-position: center;
-      bottom: 0;
-      content: "";
-      left: 0;
-      position: absolute;
-      top: 0;
-      width: 100%;
-    }
-  `;
-        const styleSheet = document.createElement("style");
-        styleSheet.innerText = styles;
-        document.head.appendChild(styleSheet);
+        appendStyle(generateLoadingImageStyleCSS(element));
         // fade loading image when video is playing or loaded
         if (willAutoPlay) {
             player.on("playing", () => element.classList.add("vimeo-video-root--loaded"));
@@ -3935,6 +3946,14 @@
         }
     };
 
+    const generateFullWidthStyleCss = (height, width) => `
+/* ensure background videos are really full width */
+div.vimeo-video-root[data-vimeo-responsive="true"] > div {
+  height: calc(${(height / width) * 100}vw);
+  max-width: 100vw;
+  padding: unset !important;
+}
+`;
     /**
      * Renders a Vimeo player in the given element using options passed as data attributes.
      *
@@ -3964,12 +3983,6 @@
                 element.dataset.vimeoBackgroundEnhanced === "true") {
                 new VimeoCameraInputTracker(element, player);
             }
-            // Set camera props for 360 video if they were passed
-            if (element.dataset.vimeoStartingCameraProps) {
-                player.on("playing", () => {
-                    player.setCameraProps(JSON.parse(element.dataset.vimeoStartingCameraProps || ""));
-                });
-            }
         }
         // If video is responsive, we need to add some styles to make sure it
         // is full width
@@ -3977,14 +3990,7 @@
             const width = yield player.getVideoWidth();
             const height = yield player.getVideoHeight();
             // Add styles to make sure background videos are full width
-            appendStyle(`
-      /* ensure background videos are really full width */
-      div.vimeo-video-root[data-vimeo-responsive="true"] > div {
-        height: calc(${(height / width) * 100}vw);
-        max-width: 100vw;
-        padding: unset !important;
-      }
-    `);
+            appendStyle(generateFullWidthStyleCss(height, width));
         }
         // Add event emitters to the player
         addEventEmitters(player, element);
@@ -4007,41 +4013,42 @@
         return player;
     });
 
+    const styleCSS = `
+/* ensures overlays for loading images and mouse tracking match size of video */
+div.vimeo-video-root {
+  position: relative;
+}
+
+/* change cursor for grab state */
+div.vimeo-video-root > div.vimeo-video-root__event-overlay {
+  cursor: grab;
+}
+
+div.vimeo-video-root > div.vimeo-video-root__event-overlay.dragging {
+  cursor: grabbing;
+}
+
+/* fade out loading image if one was provided when video starts playing or is loaded */
+div.vimeo-video-root.vimeo-video-root--loaded::after {
+  animation: vimeo-video-root__loading-animation 0.5s ease-in-out forwards;
+}
+
+@keyframes vimeo-video-root__loading-animation {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+`;
     /**
      * Loads the Vimeo player API and sets up all Vimeo video root elements on the page.
      */
     const load = () => __awaiter(void 0, void 0, void 0, function* () {
         // Add styles to the page for the Vimeo video root elements
-        appendStyle(`
-   /* ensures overlays for loading images and mouse tracking match size of video */
-   div.vimeo-video-root {
-     position: relative;
-   }
-
-   /* change cursor for grab state */
-   div.vimeo-video-root > div.vimeo-video-root__event-overlay {
-     cursor: grab;
-   }
-
-   div.vimeo-video-root > div.vimeo-video-root__event-overlay.dragging {
-     cursor: grabbing;
-   }
-
-   /* fade out loading image if one was provided when video starts playing or is loaded */
-   div.vimeo-video-root.vimeo-video-root--loaded::after {
-     animation: vimeo-video-root__loading-animation 0.5s ease-in-out forwards;
-   }
-
-   @keyframes vimeo-video-root__loading-animation {
-     0% {
-       opacity: 1;
-     }
-     100% {
-       opacity: 0;
-       visibility: hidden;
-     }
-   }
- `);
+        appendStyle(styleCSS);
         // Find all Vimeo video root elements on the page
         const videoRoots = [
             ...document.querySelectorAll("div.vimeo-video-root"),
@@ -4054,6 +4061,7 @@
     window.onload = load;
 
     exports.load = load;
+    exports.styleCSS = styleCSS;
 
     return exports;
 

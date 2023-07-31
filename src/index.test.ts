@@ -1,23 +1,15 @@
-import { load } from "./index";
-
-// MOCKS
-
-jest.mock("./lib/render-video-player", () =>
-  jest.fn((element) => element.dataset.vimeoId)
-);
+import { load, styleCSS } from "./index";
+import { isStyleInStyleSheets } from "./test-utils";
 
 describe("load", () => {
   it("appends a stylesheet for video root elements containing Vimeo players", async () => {
     await load();
 
-    const styleElements = document.head.querySelectorAll("style");
-    expect(styleElements.length).toBeGreaterThan(0);
-
-    const mainStyle = styleElements[0];
-    expect(mainStyle.textContent).toContain("vimeo-video-root");
+    expect(isStyleInStyleSheets(styleCSS, document)).toBe(true);
   });
 
-  it("sets up Vimeo player on elements with 'vimeo-video-root' class", async () => {
+  it("sets up Vimeo player on elements with 'vimeo-video-root' class and attached player instances to `window.vimeoPlayers`", async () => {
+    // Create 10 elements, every other one will be a vimeo video root
     Array(10)
       .fill(null)
       .forEach((_, index) => {
@@ -34,6 +26,14 @@ describe("load", () => {
 
     expect(window.vimeoPlayers).toBeDefined();
     expect(window.vimeoPlayers.length).toBe(5);
-    expect(window.vimeoPlayers).toStrictEqual(["0", "2", "4", "6", "8"]);
+
+    // Get the vimeo player vimeo ids from the players
+    const playerIds = window.vimeoPlayers.map(
+      (player) =>
+        Object.getOwnPropertyDescriptor(player, "_element")?.value?.dataset
+          ?.vimeoId
+    );
+
+    expect(playerIds).toStrictEqual(["0", "2", "4", "6", "8"]);
   });
 });

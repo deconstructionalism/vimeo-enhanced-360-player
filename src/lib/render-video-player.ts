@@ -7,6 +7,15 @@ import {
   checkIf360Video,
 } from "./vimeo-video-player-helpers";
 
+const generateFullWidthStyleCss = (height: number, width: number): string => `
+/* ensure background videos are really full width */
+div.vimeo-video-root[data-vimeo-responsive="true"] > div {
+  height: calc(${(height / width) * 100}vw);
+  max-width: 100vw;
+  padding: unset !important;
+}
+`;
+
 /**
  * Renders a Vimeo player in the given element using options passed as data attributes.
  *
@@ -40,15 +49,6 @@ const renderVideoPlayer = async (element: HTMLElement): Promise<Player> => {
     ) {
       const _ = new VimeoCameraInputTracker(element, player);
     }
-
-    // Set camera props for 360 video if they were passed
-    if (element.dataset.vimeoStartingCameraProps) {
-      player.on("playing", () => {
-        player.setCameraProps(
-          JSON.parse(element.dataset.vimeoStartingCameraProps || "")
-        );
-      });
-    }
   }
 
   // If video is responsive, we need to add some styles to make sure it
@@ -58,14 +58,7 @@ const renderVideoPlayer = async (element: HTMLElement): Promise<Player> => {
     const height = await player.getVideoHeight();
 
     // Add styles to make sure background videos are full width
-    appendStyle(`
-      /* ensure background videos are really full width */
-      div.vimeo-video-root[data-vimeo-responsive="true"] > div {
-        height: calc(${(height / width) * 100}vw);
-        max-width: 100vw;
-        padding: unset !important;
-      }
-    `);
+    appendStyle(generateFullWidthStyleCss(height, width));
   }
 
   // Add event emitters to the player
@@ -96,3 +89,4 @@ const renderVideoPlayer = async (element: HTMLElement): Promise<Player> => {
 };
 
 export default renderVideoPlayer;
+export { generateFullWidthStyleCss };
