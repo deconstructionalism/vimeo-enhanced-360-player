@@ -2,9 +2,10 @@
 
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/deconstructionalism/vimeo-no-code-video-player/blob/main/LICENSE)
 
-![CI Passing](https://github.com/deconstructionalism/vimeo-enhanced-360-player/actions/workflows/ci.yml/badge.svg)
+![CI Passing](https://github.com/deconstructionalism/vimeo-enhanced-360-player/actions/workflows/ci.yml/badge.svg?branch=main)
 
-https://github.com/deconstructionalism/vimeo-enhanced-360-player/actions/workflows/ci.yml/badge.svgwebsite without writing any code. This library allows for clean, unobstructed, interactive 360 videos.
+Vimeo Enhanced 360 Player is a lightweight JavaScript library that allows you to embed Vimeo 360 videos into your
+website without writing any code. This library allows for clean, unobstructed, interactive 360 videos.
 
 ## Features
 
