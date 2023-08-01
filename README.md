@@ -1,6 +1,6 @@
 # Vimeo Enhanced 360 Player
 
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/deconstructionalism/vimeo-no-code-video-player/blob/main/LICENSE)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/deconstructionalism/vimeo-enhanced-360-player/blob/main/LICENSE)
 
 ![CI Passing](https://github.com/deconstructionalism/vimeo-enhanced-360-player/actions/workflows/ci.yml/badge.svg?branch=main)
 
