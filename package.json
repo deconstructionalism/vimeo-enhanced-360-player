@@ -10,7 +10,7 @@
     "lint:ci": "npx tslint --config ./tslint.json --project ./tsconfig.json",
     "lint": "npx tslint --config ./tslint.json --project ./tsconfig.json --fix",
     "start": "npx rollup --watch --config ./rollup.config.js",
-    "test": "npx jest",
+    "test": "npx jest"
   },
   "repository": {
     "type": "git",
