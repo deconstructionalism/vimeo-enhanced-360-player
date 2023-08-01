@@ -2,6 +2,8 @@
 
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/deconstructionalism/vimeo-no-code-video-player/blob/main/LICENSE)
 
+![CI Passing](https://github.com/github/docs/actions/workflows/ci.yml/badge.svg)
+
 Vimeo Enhanced 360 Player is a lightweight JavaScript library that allows you to embed Vimeo 360 videos into your
 website without writing any code. This library allows for clean, unobstructed, interactive 360 videos.
 
@@ -16,6 +18,7 @@ website without writing any code. This library allows for clean, unobstructed, i
 - Show a loading image while the video is loading
 - Add a CSS class to body when a mobile browser is detected for easy styling
 - Emit custom events from players that can be listened to via JavaScript
+- Vimeo player instances can be accessed via a global variable
 
 ## Installation
 
@@ -65,6 +68,12 @@ when it starts playing, which can then be caught in a parent element such as `do
   })
 </script>
 ```
+
+## Player Instances
+
+This library will store the Vimeo player instances in a global array,
+`window.vimeoPlayers`, in case you wish to manipulate the players directly
+using Javascript.
 
 ## Options
 
