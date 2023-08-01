@@ -4,11 +4,13 @@
   "description": "Wrapper around Vimeo's player.js that allows configuration of all vimeo player settings using HTML",
   "main": "src/index.js",
   "scripts": {
-    "start": "npx rollup --watch --config ./rollup.config.js",
     "build": "BUILD=1 npx rollup --config ./rollup.config.js",
-    "test": "npx jest",
+    "format": "npx prettier --no-config --write src/**/*.ts",
+    "format:ci:": "npx prettier --no-config --check src/**/*.ts",
+    "lint:ci": "npx tslint --config ./tslint.json --project ./tsconfig.json",
     "lint": "npx tslint --config ./tslint.json --project ./tsconfig.json --fix",
-    "format": "npx prettier --no-config --write src/**/*.ts"
+    "start": "npx rollup --watch --config ./rollup.config.js",
+    "test": "npx jest",
   },
   "repository": {
     "type": "git",
