@@ -20,6 +20,18 @@ website without writing any code. This library allows for clean, unobstructed, i
 - Emit custom events from players that can be listened to via JavaScript
 - Vimeo player instances can be accessed via a global variable
 
+## Table of Contents
+
+- [Installation](#Installation)
+- [Usage](#Usage)
+- [Mobile Browser Detection](#MobileBrowserDetection)
+- [Player Events](#PlayerEvents)
+- [Player Instances](#PlayerInstances)
+- [Options](#Options)
+- [Custom Options](#CustomOptions)
+- [Development](#Development)
+- [Contributing](#Contributing)
+
 ## Installation
 
 To use the Vimeo Enhanced 360 Player in your project, follow these steps:
@@ -63,9 +75,9 @@ when it starts playing, which can then be caught in a parent element such as `do
 ></div>
 
 <script>
-  document.addEventListener('vimeo-enhanced-360-player-playing', () => {
-    alert('The video is playing!')
-  })
+  document.addEventListener("vimeo-enhanced-360-player-playing", () => {
+    alert("The video is playing!");
+  });
 </script>
 ```
 
