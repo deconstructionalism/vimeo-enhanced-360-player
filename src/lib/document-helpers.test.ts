@@ -1,3 +1,4 @@
+import { isStyleInStyleSheets } from "../test-utils";
 import {
   appendStyle,
   checkIfMobileBrowser,
@@ -10,12 +11,10 @@ describe("appendStyle", () => {
     const cssStyle = "body { background-color: red; }";
     appendStyle(cssStyle);
 
-    // get style elements from head
-    const head = document.head;
-    const styleElements = head.querySelectorAll("style");
+    const styleElements = document.querySelectorAll("style");
 
     expect(styleElements.length).toBe(1);
-    expect(styleElements[0].innerHTML).toBe(cssStyle);
+    expect(isStyleInStyleSheets(cssStyle, document)).toBe(true);
   });
 });
 

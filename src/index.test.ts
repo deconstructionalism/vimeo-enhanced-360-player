@@ -2,6 +2,10 @@ import { load, styleCSS } from "./index";
 import { isStyleInStyleSheets } from "./test-utils";
 
 describe("load", () => {
+  beforeEach(() => {
+    window.vimeoPlayers = [];
+  });
+
   it("appends a stylesheet for video root elements containing Vimeo players", async () => {
     await load();
 

@@ -14,7 +14,7 @@ import {
 
 // CONSTANTS
 
-const BACKGROUND_URL = "https://example.com/image.png";
+const VIMEO_LOADING_IMAGE_URL = "https://example.com/image.png";
 
 describe("addEventEmitters", () => {
   beforeEach(() => {
@@ -57,7 +57,7 @@ describe("addLoadingImage", () => {
   it("adds loading image if `vimeoLoadingImageUrl` is in element dataset", async () => {
     // Create element to contain Vimeo player and attempt to add loading image
     const { player, element } = await createPlayerAndElement({
-      vimeoLoadingImageUrl: BACKGROUND_URL,
+      vimeoLoadingImageUrl: VIMEO_LOADING_IMAGE_URL,
     });
     addLoadingImage(player, element, false);
 
@@ -69,7 +69,7 @@ describe("addLoadingImage", () => {
   it("applies class to fade out loading image when non-auto-played video is loaded", async () => {
     // Create element to contain Vimeo player and attempt to add loading image
     const { player, element } = await createPlayerAndElement({
-      vimeoLoadingImageUrl: BACKGROUND_URL,
+      vimeoLoadingImageUrl: VIMEO_LOADING_IMAGE_URL,
     });
     addLoadingImage(player, element, false);
 
@@ -85,7 +85,7 @@ describe("addLoadingImage", () => {
   it("applies class to fade out loading image when auto-played video is played", async () => {
     // Create element to contain Vimeo player and attempt to add loading image
     const { player, element } = await createPlayerAndElement({
-      vimeoLoadingImageUrl: BACKGROUND_URL,
+      vimeoLoadingImageUrl: VIMEO_LOADING_IMAGE_URL,
     });
     addLoadingImage(player, element, false);
 

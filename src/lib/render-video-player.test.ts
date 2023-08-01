@@ -18,6 +18,7 @@ jest.mock("./vimeo-camera-input-tracker");
 const VIMEO_ID = "12345";
 const VIMEO_MOBILE_FALLBACK_URL = "https://vimeo.com/5678";
 const VIMEO_MOBILE_FALLBACK_ID = "5678";
+const VIMEO_LOADING_IMAGE_URL = "https://example.com/image.png";
 
 describe("renderVideoPlayer", () => {
   beforeEach(() => {
@@ -174,12 +175,21 @@ describe("renderVideoPlayer", () => {
     );
 
     // Create player and element using `renderVideoPlayer`
-    const { player } = await createPlayerAndElement(
-      { vimeoId: VIMEO_ID, vimeoAutoplay: "true" },
+    const { player, element } = await createPlayerAndElement(
+      {
+        vimeoId: VIMEO_ID,
+        vimeoAutoplay: "true",
+        vimeoLoadingImageUrl: VIMEO_LOADING_IMAGE_URL,
+      },
       true
     );
 
+    const expectedStyle =
+      vimeoVideoPlayerHelpers.generateLoadingImageStyleCSS(element);
+
     expect(addLoadingImageSpy).toHaveBeenCalledTimes(1);
+    expect(addLoadingImageSpy).toHaveBeenCalledWith(player, element, true);
+    expect(isStyleInStyleSheets(expectedStyle, document)).toBe(true);
     expect(player.setVolume).toHaveBeenCalledTimes(1);
     expect(player.setVolume).toHaveBeenCalledWith(0);
     expect(player.getVideoId).toHaveBeenCalledTimes(1);
@@ -200,12 +210,21 @@ describe("renderVideoPlayer", () => {
     );
 
     // Create player and element using `renderVideoPlayer`
-    const { player } = await createPlayerAndElement(
-      { vimeoId: VIMEO_ID, vimeoBackground: "true" },
+    const { player, element } = await createPlayerAndElement(
+      {
+        vimeoId: VIMEO_ID,
+        vimeoBackground: "true",
+        vimeoLoadingImageUrl: VIMEO_LOADING_IMAGE_URL,
+      },
       true
     );
 
+    const expectedStyle =
+      vimeoVideoPlayerHelpers.generateLoadingImageStyleCSS(element);
+
     expect(addLoadingImageSpy).toHaveBeenCalledTimes(1);
+    expect(addLoadingImageSpy).toHaveBeenCalledWith(player, element, true);
+    expect(isStyleInStyleSheets(expectedStyle, document)).toBe(true);
     expect(player.setVolume).toHaveBeenCalledTimes(1);
     expect(player.setVolume).toHaveBeenCalledWith(0);
     expect(player.getVideoId).toHaveBeenCalledTimes(1);
@@ -217,6 +236,7 @@ describe("renderVideoPlayer", () => {
     expect(player.loadVideo).toHaveBeenCalledWith(videoId);
     expect(player.play).toHaveBeenCalledTimes(1);
   });
+
   it("adds loading image and auto-plays if it's a background enhanced video", async () => {
     // Spy on `addLoadingImage`
     const addLoadingImageSpy = jest.spyOn(
@@ -225,16 +245,22 @@ describe("renderVideoPlayer", () => {
     );
 
     // Create player and element using `renderVideoPlayer`
-    const { player } = await createPlayerAndElement(
+    const { player, element } = await createPlayerAndElement(
       {
         vimeoId: VIMEO_ID,
         vimeoBackground: "true",
         vimeoBackgroundEnhanced: "true",
+        vimeoLoadingImageUrl: VIMEO_LOADING_IMAGE_URL,
       },
       true
     );
 
+    const expectedStyle =
+      vimeoVideoPlayerHelpers.generateLoadingImageStyleCSS(element);
+
     expect(addLoadingImageSpy).toHaveBeenCalledTimes(1);
+    expect(addLoadingImageSpy).toHaveBeenCalledWith(player, element, true);
+    expect(isStyleInStyleSheets(expectedStyle, document)).toBe(true);
     expect(player.setVolume).toHaveBeenCalledTimes(1);
     expect(player.setVolume).toHaveBeenCalledWith(0);
     expect(player.getVideoId).toHaveBeenCalledTimes(1);
@@ -246,6 +272,7 @@ describe("renderVideoPlayer", () => {
     expect(player.loadVideo).toHaveBeenCalledWith(videoId);
     expect(player.play).toHaveBeenCalledTimes(1);
   });
+
   it("adds loading image if it is not background or auto-play video", async () => {
     // Spy on `addLoadingImage`
     const addLoadingImageSpy = jest.spyOn(
@@ -254,12 +281,17 @@ describe("renderVideoPlayer", () => {
     );
 
     // Create player and element using `renderVideoPlayer`
-    const { player } = await createPlayerAndElement(
-      { vimeoId: VIMEO_ID },
+    const { player, element } = await createPlayerAndElement(
+      { vimeoId: VIMEO_ID, vimeoLoadingImageUrl: VIMEO_LOADING_IMAGE_URL },
       true
     );
 
+    const expectedStyle =
+      vimeoVideoPlayerHelpers.generateLoadingImageStyleCSS(element);
+
     expect(addLoadingImageSpy).toHaveBeenCalledTimes(1);
+    expect(addLoadingImageSpy).toHaveBeenCalledWith(player, element, false);
+    expect(isStyleInStyleSheets(expectedStyle, document)).toBe(true);
     expect(player.setVolume).not.toHaveBeenCalled();
     expect(player.getVideoId).not.toHaveBeenCalled();
     expect(player.loadVideo).not.toHaveBeenCalled();

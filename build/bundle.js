@@ -1,5 +1,3 @@
-
-(function(l, r) { if (!l || l.getElementById('livereloadscript')) return; r = l.createElement('script'); r.async = 1; r.src = '//' + (self.location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1'; r.id = 'livereloadscript'; l.getElementsByTagName('head')[0].appendChild(r) })(self.document);
 var bundle = (function (exports) {
     'use strict';
 
@@ -3827,7 +3825,9 @@ var bundle = (function (exports) {
      */
     const uuid = () => {
         // generate v4 UUID part
-        const s4 = () => Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+        const s4 = () => Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1);
         return `${s4()}${s4()}-${s4()}-${s4()}-${s4()}-${s4()}`;
     };
     /**
