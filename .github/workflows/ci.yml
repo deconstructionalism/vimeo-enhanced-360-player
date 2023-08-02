@@ -23,10 +23,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
-      - name: Set git to use LF
-        run: |
-          git config --global core.autocrlf false
-          git config --global core.eol lf
       - run: npm ci
       - run: npm run lint:ci
       - run: npm run format:ci
