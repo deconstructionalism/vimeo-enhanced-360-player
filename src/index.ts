@@ -1,13 +1,7 @@
-import Player from "@vimeo/player";
-import renderVideoPlayer from "./lib/render-video-player";
 import { appendStyle } from "./lib/document-helpers";
+import renderVideoPlayer from "./lib/render-video-player";
 
-// Add `vimeoPlayers` to the global window object
-declare global {
-  interface Window {
-    vimeoPlayers: Player[];
-  }
-}
+// EXPORTS
 
 const styleCSS = `
 /* ensures overlays for loading images and mouse tracking match size of video */
@@ -60,4 +54,4 @@ const load = async (): Promise<void> => {
 
 window.onload = load;
 
-export { load, styleCSS }
+export { load, styleCSS };

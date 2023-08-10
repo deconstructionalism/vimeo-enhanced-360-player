@@ -1,9 +1,11 @@
-import { isStyleInStyleSheets } from "../test-utils";
+import { isStyleInStyleSheets } from "../test-utils/document-utils";
 import {
   appendStyle,
   checkIfMobileBrowser,
   mobileBrowserUserAgents,
 } from "./document-helpers";
+
+// TESTS
 
 describe("appendStyle", () => {
   it("appends css to the document head", () => {

@@ -1,5 +1,9 @@
 import Player from "@vimeo/player";
+
 import renderVideoPlayer from "../lib/render-video-player";
+import { ExtendedPlayer } from "../types";
+
+// EXPORTS
 
 /**
  * Create a vimeo player and element with the given dataset.
@@ -12,7 +16,7 @@ import renderVideoPlayer from "../lib/render-video-player";
 const createPlayerAndElement = async (
   dataset: { [key: string]: string } = {},
   useRenderVideoPlayer: boolean = false
-): Promise<{ player: Player; element: HTMLElement }> => {
+): Promise<{ player: ExtendedPlayer; element: HTMLElement }> => {
   // Create element and populate dataset
   const element = document.createElement("div");
   Object.entries(dataset).forEach(([key, value]) => {
@@ -29,30 +33,18 @@ const createPlayerAndElement = async (
 };
 
 /**
- * Check that a style is in the document's stylesheets.
- *
- * @param style - The style to check for
- * @param document - The document to check in
- * @returns whether the style is in the document's stylesheets
- */
-const isStyleInStyleSheets = (style: string, document: Document): boolean => {
-  // Serialize all stylesheets into an array of strings
-  const styleElements = document.querySelectorAll("style");
-  const styles = [...styleElements].map((element) => element.innerHTML);
-
-  return styles.includes(style);
-};
-
-/**
  * Simulates the given event type on the given Vimeo player instance.
  *
  * @param player - Vimeo player instance to simulate event on
  * @param eventType - event type to simulate
  */
-const simulatePlayerEvent = (player: Player, eventType: string): void => {
+const simulatePlayerEvent = (
+  player: ExtendedPlayer,
+  eventType: string
+): void => {
   // use `getOwnPropertyDescriptor` to get access to private `_simulate` methods
   // that are otherwise not part of `Player` type
   Object.getOwnPropertyDescriptor(player, "_simulate")?.value(eventType);
 };
 
-export { createPlayerAndElement, isStyleInStyleSheets, simulatePlayerEvent };
+export { createPlayerAndElement, simulatePlayerEvent };

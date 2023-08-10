@@ -1,12 +1,23 @@
 import Player from "@vimeo/player";
-import VimeoCameraInputTracker from "./vimeo-camera-input-tracker";
+
+import { ExtendedPlayer } from "../types";
 import { appendStyle, checkIfMobileBrowser } from "./document-helpers";
+import VimeoCameraInputTracker from "./vimeo-camera-input-tracker";
 import {
   addEventEmitters,
   addLoadingImage,
   checkIf360Video,
 } from "./vimeo-video-player-helpers";
 
+// EXPORTS
+
+/**
+ * Add styles to ensure that background videos are really full width.
+ *
+ * @param height - height of video in pixels
+ * @param width - width of video in pixels
+ * @returns CSS string
+ */
 const generateFullWidthStyleCss = (height: number, width: number): string => `
 /* ensure background videos are really full width */
 div.vimeo-video-root[data-vimeo-responsive="true"] > div {
@@ -23,9 +34,11 @@ div.vimeo-video-root[data-vimeo-responsive="true"] > div {
  *
  * @returns player instance
  */
-const renderVideoPlayer = async (element: HTMLElement): Promise<Player> => {
+const renderVideoPlayer = async (
+  element: HTMLElement
+): Promise<ExtendedPlayer> => {
   // Create a new Vimeo player instance
-  const player = new Player(element);
+  const player: ExtendedPlayer = new Player(element);
 
   // On mobile devices, we should attempt to load a fallback video if provided
   if (checkIfMobileBrowser()) {
@@ -47,7 +60,13 @@ const renderVideoPlayer = async (element: HTMLElement): Promise<Player> => {
       element.dataset.vimeoBackground === "true" &&
       element.dataset.vimeoBackgroundEnhanced === "true"
     ) {
-      const _ = new VimeoCameraInputTracker(element, player);
+      const { yaw, pitch } = await player.getCameraProps();
+      player._tracker = new VimeoCameraInputTracker(
+        element,
+        player,
+        yaw,
+        pitch
+      );
     }
   }
 

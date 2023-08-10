@@ -1,4 +1,5 @@
-import Player, { EventMap } from "@vimeo/player";
+import { EventMap } from "@vimeo/player";
+import { ExtendedPlayer } from "../types";
 import { appendStyle } from "./document-helpers";
 
 // HELPER FUNCTIONS
@@ -17,6 +18,8 @@ const uuid = (): `${string}-${string}-${string}-${string}-${string}` => {
 
   return `${s4()}${s4()}-${s4()}-${s4()}-${s4()}-${s4()}`;
 };
+
+// EXPORTS
 
 /**
  * Adds a loading image to the given element.
@@ -85,7 +88,10 @@ const eventTypes = ((): string[] => {
  * @param player - Vimeo player instance to add event listeners to
  * @param element - element containing Vimeo player
  */
-const addEventEmitters = (player: Player, element: HTMLElement): void => {
+const addEventEmitters = (
+  player: ExtendedPlayer,
+  element: HTMLElement
+): void => {
   // Add event listeners to the player
   eventTypes.forEach((eventType: string) => {
     // listen for player events
@@ -107,7 +113,7 @@ const addEventEmitters = (player: Player, element: HTMLElement): void => {
  *
  * @returns whether or not player is playing 360 video
  */
-const checkIf360Video = async (player: Player): Promise<boolean> => {
+const checkIf360Video = async (player: ExtendedPlayer): Promise<boolean> => {
   try {
     await player.getCameraProps();
   } catch (error) {
@@ -126,7 +132,7 @@ const checkIf360Video = async (player: Player): Promise<boolean> => {
  * @param willAutoPlay - whether or not video will autoplay
  */
 const addLoadingImage = (
-  player: Player,
+  player: ExtendedPlayer,
   element: HTMLElement,
   willAutoPlay: boolean
 ): void => {

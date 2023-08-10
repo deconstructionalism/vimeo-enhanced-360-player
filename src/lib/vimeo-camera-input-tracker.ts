@@ -1,18 +1,21 @@
-import Player from "@vimeo/player";
+import { ExtendedPlayer } from "../types";
+import { MinMaxRange, generateRangeTransform } from "./range-operations";
 import throttle from "./throttle";
-import { generateRangeTransform, MinMaxRange } from "./range-operations";
 
 // CONSTANTS
 
-const YAW_RANGE = new MinMaxRange(0, 360, true, 180);
-const PITCH_RANGE = new MinMaxRange(-90, 90, false, 0);
-const KEY_PRESS_INCREMENT = 5;
+export const YAW_RANGE = new MinMaxRange(0, 360, true, 0);
+export const PITCH_RANGE = new MinMaxRange(-90, 90, false, 0);
+export const KEY_PRESS_INCREMENT = 5;
+const FIREFOX_THROTTLE_INTERVAL = 50;
+
+// EXPORTS
 
 class VimeoCameraInputTracker {
   element: HTMLElement;
-  player: Player;
+  player: ExtendedPlayer;
   eventOverlay: HTMLElement;
-  moveCamera: (yawDelta: number, pitchDelta: number) => Promise<void> | void;
+  moveCamera: (yaw: number, pitch: number) => Promise<void> | void;
   dragData: { xRange: MinMaxRange; yRange: MinMaxRange };
 
   /**
@@ -25,8 +28,15 @@ class VimeoCameraInputTracker {
    *
    * @param element - element Vimeo player is rendered in
    * @param player - Vimeo player rendered in element
+   * @param startingYaw - starting yaw of the camera
+   * @param startingPitch - starting pitch of the camera
    */
-  constructor(element: HTMLElement, player: Player) {
+  constructor(
+    element: HTMLElement,
+    player: ExtendedPlayer,
+    startingYaw: number,
+    startingPitch: number
+  ) {
     this.element = element;
     this.player = player;
     this.eventOverlay = this.addEventOverlay();
@@ -38,8 +48,11 @@ class VimeoCameraInputTracker {
     // Set moveCamera to a throttled version of _moveCamera, with higher latency if
     // browser is firefox since firefox is very laggy in handling mousemove events
     this.moveCamera = /Firefox/i.test(navigator.userAgent)
-      ? throttle(this._moveCamera, 50)
+      ? throttle(this._moveCamera, FIREFOX_THROTTLE_INTERVAL)
       : this._moveCamera;
+
+    YAW_RANGE.current = startingYaw;
+    PITCH_RANGE.current = startingPitch;
   }
 
   /**
@@ -103,13 +116,13 @@ class VimeoCameraInputTracker {
         xStart - width * 0.25,
         xStart + width * 0.25,
         false,
-        width
+        xStart
       ),
       yRange: new MinMaxRange(
         yStart - height * 0.25,
         yStart + height * 0.25,
         false,
-        height
+        yStart
       ),
     };
   };
@@ -135,7 +148,7 @@ class VimeoCameraInputTracker {
    *
    * @param event - mousemove event
    */
-  handleMouseMove = (event: MouseEvent): void => {
+  handleMouseMove = async (event: MouseEvent): Promise<void> => {
     event.preventDefault();
 
     const { xRange, yRange } = this.dragData;
@@ -149,7 +162,7 @@ class VimeoCameraInputTracker {
     const nextYaw = xTransform(xRange.current);
     const nextPitch = yTransform(yRange.current);
 
-    this.moveCamera(nextYaw, -nextPitch);
+    await this.moveCamera(nextYaw, -nextPitch);
   };
 
   /**
@@ -168,7 +181,7 @@ class VimeoCameraInputTracker {
    *
    * @param event - keydown event
    */
-  handleKeyDown = (event: KeyboardEvent): void => {
+  handleKeyDown = async (event: KeyboardEvent): Promise<void> => {
     // If the event overlay is not focused or arrow keys are not pressed, do nothing
     if (
       !(document.activeElement === this.eventOverlay) ||
@@ -182,25 +195,25 @@ class VimeoCameraInputTracker {
     // Move the camera based on the arrow key pressed
     switch (event.key) {
       case "ArrowRight":
-        this.moveCamera(
+        await this.moveCamera(
           YAW_RANGE.current + KEY_PRESS_INCREMENT,
           PITCH_RANGE.current
         );
         break;
       case "ArrowLeft":
-        this.moveCamera(
+        await this.moveCamera(
           YAW_RANGE.current - KEY_PRESS_INCREMENT,
           PITCH_RANGE.current
         );
         break;
       case "ArrowUp":
-        this.moveCamera(
+        await this.moveCamera(
           YAW_RANGE.current,
           PITCH_RANGE.current + KEY_PRESS_INCREMENT
         );
         break;
       case "ArrowDown":
-        this.moveCamera(
+        await this.moveCamera(
           YAW_RANGE.current,
           PITCH_RANGE.current - KEY_PRESS_INCREMENT
         );

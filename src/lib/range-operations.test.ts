@@ -1,5 +1,7 @@
 import { MinMaxRange, generateRangeTransform } from "./range-operations";
 
+// TESTS
+
 describe("MinMaxRange", () => {
   it("throws error for ranges where max is not greater than min", () => {
     expect(() => new MinMaxRange(1, 0)).toThrow();

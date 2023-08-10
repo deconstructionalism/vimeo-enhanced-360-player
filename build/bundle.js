@@ -1,3 +1,5 @@
+
+(function(l, r) { if (!l || l.getElementById('livereloadscript')) return; r = l.createElement('script'); r.async = 1; r.src = '//' + (self.location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1'; r.id = 'livereloadscript'; l.getElementsByTagName('head')[0].appendChild(r) })(self.document);
 var bundle = (function (exports) {
     'use strict';
 
@@ -27,6 +29,42 @@ var bundle = (function (exports) {
             step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
     }
+
+    // EXPORTS
+    /**
+     * Appends a style element to the document head with the given css.
+     *
+     * @param css - css to append to the document
+     */
+    const appendStyle = (css) => {
+        const styleSheet = document.createElement("style");
+        styleSheet.innerHTML = css;
+        document.head.appendChild(styleSheet);
+    };
+    // List of mobile browser user agents
+    const mobileBrowserUserAgents = [
+        "iPhone",
+        "iPad",
+        "iPod",
+        "Android",
+        "BlackBerry",
+        "IEMobile",
+        "Opera Mini",
+    ];
+    /**
+     * Checks if the current browser is a mobile browser.
+     * Will append a custom class to the body if it is a mobile browser.
+     *
+     * @returns whether or not the current browser is a mobile browser
+     */
+    const checkIfMobileBrowser = () => {
+        const isMobile = new RegExp(mobileBrowserUserAgents.join("|"), "i").test(navigator.userAgent);
+        // Add class to body if mobile browser
+        if (isMobile) {
+            document.body.classList.add("vimeo-enhanced-360-player--mobile-browser");
+        }
+        return isMobile;
+    };
 
     /*! @vimeo/player v2.20.1 | (c) 2023 Vimeo | MIT License | https://github.com/vimeo/player.js */
     function ownKeys(object, enumerableOnly) {
@@ -3558,25 +3596,7 @@ var bundle = (function (exports) {
       checkUrlTimeParam();
     }
 
-    /**
-     * Throttle function calls to a given limit.
-     *
-     * @param func - function to throttle
-     * @param limit - limit in milliseconds
-     *
-     * @returns throttled function
-     */
-    const throttle = (func, limit) => {
-        let inThrottle = false;
-        return (...args) => {
-            if (!inThrottle) {
-                inThrottle = true;
-                func(...args);
-                setTimeout(() => (inThrottle = false), limit);
-            }
-        };
-    };
-
+    // EXPORTS
     class MinMaxRange {
         /**
          * A numeric range with a minimum and maximum value and current index,
@@ -3634,10 +3654,32 @@ var bundle = (function (exports) {
         };
     };
 
+    // EXPORTS
+    /**
+     * Throttle function calls to a given limit.
+     *
+     * @param func - function to throttle
+     * @param limit - limit in milliseconds
+     *
+     * @returns throttled function
+     */
+    const throttle = (func, limit) => {
+        let inThrottle = false;
+        return (...args) => {
+            if (!inThrottle) {
+                inThrottle = true;
+                setTimeout(() => (inThrottle = false), limit);
+                return func(...args);
+            }
+        };
+    };
+
     // CONSTANTS
-    const YAW_RANGE = new MinMaxRange(0, 360, true, 180);
+    const YAW_RANGE = new MinMaxRange(0, 360, true, 0);
     const PITCH_RANGE = new MinMaxRange(-90, 90, false, 0);
     const KEY_PRESS_INCREMENT = 5;
+    const FIREFOX_THROTTLE_INTERVAL = 50;
+    // EXPORTS
     class VimeoCameraInputTracker {
         /**
          * Tracks click and drag mouse movement or arrow key press and moves the camera of the given
@@ -3649,8 +3691,10 @@ var bundle = (function (exports) {
          *
          * @param element - element Vimeo player is rendered in
          * @param player - Vimeo player rendered in element
+         * @param startingYaw - starting yaw of the camera
+         * @param startingPitch - starting pitch of the camera
          */
-        constructor(element, player) {
+        constructor(element, player, startingYaw, startingPitch) {
             /**
              * Moves the camera of the Vimeo player to new position.
              *
@@ -3697,8 +3741,8 @@ var bundle = (function (exports) {
             this.storeDragData = (xStart, yStart) => {
                 const { width, height } = this.element.getBoundingClientRect();
                 this.dragData = {
-                    xRange: new MinMaxRange(xStart - width * 0.25, xStart + width * 0.25, false, width),
-                    yRange: new MinMaxRange(yStart - height * 0.25, yStart + height * 0.25, false, height),
+                    xRange: new MinMaxRange(xStart - width * 0.25, xStart + width * 0.25, false, xStart),
+                    yRange: new MinMaxRange(yStart - height * 0.25, yStart + height * 0.25, false, yStart),
                 };
             };
             /**
@@ -3719,7 +3763,7 @@ var bundle = (function (exports) {
              *
              * @param event - mousemove event
              */
-            this.handleMouseMove = (event) => {
+            this.handleMouseMove = (event) => __awaiter(this, void 0, void 0, function* () {
                 event.preventDefault();
                 const { xRange, yRange } = this.dragData;
                 xRange.current = event.clientX;
@@ -3728,8 +3772,8 @@ var bundle = (function (exports) {
                 const yTransform = generateRangeTransform(yRange, PITCH_RANGE);
                 const nextYaw = xTransform(xRange.current);
                 const nextPitch = yTransform(yRange.current);
-                this.moveCamera(nextYaw, -nextPitch);
-            };
+                yield this.moveCamera(nextYaw, -nextPitch);
+            });
             /**
              * Handles mouseup events on the event overlay.
              */
@@ -3744,7 +3788,7 @@ var bundle = (function (exports) {
              *
              * @param event - keydown event
              */
-            this.handleKeyDown = (event) => {
+            this.handleKeyDown = (event) => __awaiter(this, void 0, void 0, function* () {
                 // If the event overlay is not focused or arrow keys are not pressed, do nothing
                 if (!(document.activeElement === this.eventOverlay) ||
                     !["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"].includes(event.key)) {
@@ -3754,19 +3798,19 @@ var bundle = (function (exports) {
                 // Move the camera based on the arrow key pressed
                 switch (event.key) {
                     case "ArrowRight":
-                        this.moveCamera(YAW_RANGE.current + KEY_PRESS_INCREMENT, PITCH_RANGE.current);
+                        yield this.moveCamera(YAW_RANGE.current + KEY_PRESS_INCREMENT, PITCH_RANGE.current);
                         break;
                     case "ArrowLeft":
-                        this.moveCamera(YAW_RANGE.current - KEY_PRESS_INCREMENT, PITCH_RANGE.current);
+                        yield this.moveCamera(YAW_RANGE.current - KEY_PRESS_INCREMENT, PITCH_RANGE.current);
                         break;
                     case "ArrowUp":
-                        this.moveCamera(YAW_RANGE.current, PITCH_RANGE.current + KEY_PRESS_INCREMENT);
+                        yield this.moveCamera(YAW_RANGE.current, PITCH_RANGE.current + KEY_PRESS_INCREMENT);
                         break;
                     case "ArrowDown":
-                        this.moveCamera(YAW_RANGE.current, PITCH_RANGE.current - KEY_PRESS_INCREMENT);
+                        yield this.moveCamera(YAW_RANGE.current, PITCH_RANGE.current - KEY_PRESS_INCREMENT);
                         break;
                 }
-            };
+            });
             this.element = element;
             this.player = player;
             this.eventOverlay = this.addEventOverlay();
@@ -3777,45 +3821,12 @@ var bundle = (function (exports) {
             // Set moveCamera to a throttled version of _moveCamera, with higher latency if
             // browser is firefox since firefox is very laggy in handling mousemove events
             this.moveCamera = /Firefox/i.test(navigator.userAgent)
-                ? throttle(this._moveCamera, 50)
+                ? throttle(this._moveCamera, FIREFOX_THROTTLE_INTERVAL)
                 : this._moveCamera;
+            YAW_RANGE.current = startingYaw;
+            PITCH_RANGE.current = startingPitch;
         }
     }
-
-    /**
-     * Appends a style element to the document head with the given css.
-     *
-     * @param css - css to append to the document
-     */
-    const appendStyle = (css) => {
-        const styleSheet = document.createElement("style");
-        styleSheet.innerHTML = css;
-        document.head.appendChild(styleSheet);
-    };
-    // List of mobile browser user agents
-    const mobileBrowserUserAgents = [
-        "iPhone",
-        "iPad",
-        "iPod",
-        "Android",
-        "BlackBerry",
-        "IEMobile",
-        "Opera Mini",
-    ];
-    /**
-     * Checks if the current browser is a mobile browser.
-     * Will append a custom class to the body if it is a mobile browser.
-     *
-     * @returns whether or not the current browser is a mobile browser
-     */
-    const checkIfMobileBrowser = () => {
-        const isMobile = new RegExp(mobileBrowserUserAgents.join("|"), "i").test(navigator.userAgent);
-        // Add class to body if mobile browser
-        if (isMobile) {
-            document.body.classList.add("vimeo-enhanced-360-player--mobile-browser");
-        }
-        return isMobile;
-    };
 
     // HELPER FUNCTIONS
     /**
@@ -3830,6 +3841,7 @@ var bundle = (function (exports) {
             .substring(1);
         return `${s4()}${s4()}-${s4()}-${s4()}-${s4()}-${s4()}`;
     };
+    // EXPORTS
     /**
      * Adds a loading image to the given element.
      *
@@ -3946,6 +3958,14 @@ div.vimeo-video-root#${element.id}::after {
         }
     };
 
+    // EXPORTS
+    /**
+     * Add styles to ensure that background videos are really full width.
+     *
+     * @param height - height of video in pixels
+     * @param width - width of video in pixels
+     * @returns CSS string
+     */
     const generateFullWidthStyleCss = (height, width) => `
 /* ensure background videos are really full width */
 div.vimeo-video-root[data-vimeo-responsive="true"] > div {
@@ -3981,7 +4001,8 @@ div.vimeo-video-root[data-vimeo-responsive="true"] > div {
             // are hidden
             if (element.dataset.vimeoBackground === "true" &&
                 element.dataset.vimeoBackgroundEnhanced === "true") {
-                new VimeoCameraInputTracker(element, player);
+                const { yaw, pitch } = yield player.getCameraProps();
+                player._tracker = new VimeoCameraInputTracker(element, player, yaw, pitch);
             }
         }
         // If video is responsive, we need to add some styles to make sure it
@@ -4013,6 +4034,7 @@ div.vimeo-video-root[data-vimeo-responsive="true"] > div {
         return player;
     });
 
+    // EXPORTS
     const styleCSS = `
 /* ensures overlays for loading images and mouse tracking match size of video */
 div.vimeo-video-root {

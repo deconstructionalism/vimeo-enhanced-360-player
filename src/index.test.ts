@@ -1,5 +1,7 @@
 import { load, styleCSS } from "./index";
-import { isStyleInStyleSheets } from "./test-utils";
+import { isStyleInStyleSheets } from "./test-utils/document-utils";
+
+// TESTS
 
 describe("load", () => {
   beforeEach(() => {

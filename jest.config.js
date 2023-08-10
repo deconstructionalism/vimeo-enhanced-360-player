@@ -2,5 +2,6 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
-  testPathIgnorePatterns: ['src/test-utils'],
+  testPathIgnorePatterns: ['/src/test-utils/'],
+  coveragePathIgnorePatterns: ['/src/test-utils/'],
 };

@@ -1,8 +1,8 @@
+import { isStyleInStyleSheets } from "../test-utils/document-utils";
 import {
-  isStyleInStyleSheets,
   createPlayerAndElement,
   simulatePlayerEvent,
-} from "../test-utils/index";
+} from "../test-utils/player-utils";
 import {
   addEventEmitters,
   addLoadingImage,
@@ -16,6 +16,8 @@ import {
 
 const VIMEO_LOADING_IMAGE_URL = "https://example.com/image.png";
 
+// TESTS
+
 describe("addEventEmitters", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -28,7 +30,7 @@ describe("addEventEmitters", () => {
 
     // make sure each event type is emitted and captured
     eventTypes.forEach((eventType) => {
-      // Create callback to listen for even
+      // Create callback to listen for event
       const callback = jest.fn();
       window.addEventListener(
         `vimeo-enhanced-360-player-${eventType}`,

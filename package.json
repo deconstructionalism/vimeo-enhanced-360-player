@@ -17,7 +17,10 @@
     "url": "git+https://github.com/deconstructionalism/vimeo-no-code-video-player.git"
   },
   "keywords": [
-    "vimeo"
+    "Vimeo",
+    "video",
+    "VR",
+    "360"
   ],
   "author": "Arjun Ray",
   "license": "MIT",

@@ -1,13 +1,11 @@
-import {
-  createPlayerAndElement,
-  isStyleInStyleSheets,
-} from "../test-utils/index";
+import { isStyleInStyleSheets } from "../test-utils/document-utils";
+import { createPlayerAndElement } from "../test-utils/player-utils";
 import { mobileBrowserUserAgents } from "./document-helpers";
-import * as vimeoVideoPlayerHelpers from "./vimeo-video-player-helpers";
 import renderVideoPlayer, {
   generateFullWidthStyleCss,
 } from "./render-video-player";
 import VimeoCameraInputTracker from "./vimeo-camera-input-tracker";
+import * as vimeoVideoPlayerHelpers from "./vimeo-video-player-helpers";
 
 // MOCKS
 
@@ -19,6 +17,8 @@ const VIMEO_ID = "12345";
 const VIMEO_MOBILE_FALLBACK_URL = "https://vimeo.com/5678";
 const VIMEO_MOBILE_FALLBACK_ID = "5678";
 const VIMEO_LOADING_IMAGE_URL = "https://example.com/image.png";
+
+// TESTS
 
 describe("renderVideoPlayer", () => {
   beforeEach(() => {
@@ -48,7 +48,10 @@ describe("renderVideoPlayer", () => {
 
     // Create player and element using `renderVideoPlayer` with mobile fallback url
     const { player } = await createPlayerAndElement(
-      { vimeoId: VIMEO_ID, vimeoMobileFallbackId: VIMEO_MOBILE_FALLBACK_ID },
+      {
+        vimeoId: VIMEO_ID,
+        vimeoMobileFallbackId: VIMEO_MOBILE_FALLBACK_ID,
+      },
       true
     );
 
@@ -63,7 +66,10 @@ describe("renderVideoPlayer", () => {
 
     // Create player and element using `renderVideoPlayer` with mobile fallback url
     const { player } = await createPlayerAndElement(
-      { vimeoId: VIMEO_ID, vimeoMobileFallbackUrl: VIMEO_MOBILE_FALLBACK_URL },
+      {
+        vimeoId: VIMEO_ID,
+        vimeoMobileFallbackUrl: VIMEO_MOBILE_FALLBACK_URL,
+      },
       true
     );
 
@@ -282,7 +288,10 @@ describe("renderVideoPlayer", () => {
 
     // Create player and element using `renderVideoPlayer`
     const { player, element } = await createPlayerAndElement(
-      { vimeoId: VIMEO_ID, vimeoLoadingImageUrl: VIMEO_LOADING_IMAGE_URL },
+      {
+        vimeoId: VIMEO_ID,
+        vimeoLoadingImageUrl: VIMEO_LOADING_IMAGE_URL,
+      },
       true
     );
 

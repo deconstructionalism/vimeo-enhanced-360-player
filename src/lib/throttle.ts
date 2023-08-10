@@ -1,4 +1,4 @@
-type ThrottledFunction = (...args: any[]) => Promise<void> | void;
+// EXPORTS
 
 /**
  * Throttle function calls to a given limit.
@@ -8,17 +8,17 @@ type ThrottledFunction = (...args: any[]) => Promise<void> | void;
  *
  * @returns throttled function
  */
-const throttle = (
-  func: ThrottledFunction,
+const throttle = <R, A extends any[]>(
+  func: (...args: A) => R,
   limit: number
-): ThrottledFunction => {
+): ((...args: A) => R | undefined) => {
   let inThrottle = false;
 
   return (...args) => {
     if (!inThrottle) {
       inThrottle = true;
-      func(...args);
       setTimeout(() => (inThrottle = false), limit);
+      return func(...args);
     }
   };
 };
