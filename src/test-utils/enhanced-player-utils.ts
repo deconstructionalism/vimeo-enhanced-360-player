@@ -195,6 +195,7 @@ const setupPlayerAndTracker = async (): Promise<PlayerContext> => {
  * Setup enhanced background player and run simulated events in sequence.
  *
  * @param simulatedEvents - Simulated events to run.
+ *
  * @returns - Context object containing player, spies, event histoyr,
  *             and other objects.
  */

@@ -186,9 +186,9 @@ describe("VimeoCameraInputTracker", () => {
       }
 
       if (yDelta > 0) {
-        expect(currCameraProps.pitch).toBeLessThan(prevCameraProps.pitch);
-      } else if (yDelta < 0) {
         expect(currCameraProps.pitch).toBeGreaterThan(prevCameraProps.pitch);
+      } else if (yDelta < 0) {
+        expect(currCameraProps.pitch).toBeLessThan(prevCameraProps.pitch);
       } else {
         expect(currCameraProps.pitch === prevCameraProps.pitch).toBe(true);
       }
@@ -270,25 +270,6 @@ describe("VimeoCameraInputTracker", () => {
   );
 
   it("does not move player camera beyond vertical range on drag", async () => {
-    // Test logic after moving mouse past bottom of range
-    const testMovePastBottomOfRange: SimulatedEventLogic["run"] = ({
-      eventHistory,
-      moveCameraSpy,
-      setCameraPropsSpy,
-    }) => {
-      // Get camera props before and after mouse movement
-      const currCameraProps = eventHistory[eventHistory.length - 1].cameraProps;
-      const prevCameraProps = eventHistory[eventHistory.length - 2].cameraProps;
-
-      expect(moveCameraSpy).toHaveBeenCalledTimes(1);
-      expect(setCameraPropsSpy).toHaveBeenCalledTimes(1);
-      expect(currCameraProps.pitch).toBeLessThan(prevCameraProps.pitch);
-      expect(currCameraProps.pitch).toBe(PITCH_RANGE.min);
-      expect(currCameraProps.fov === prevCameraProps.fov).toBe(true);
-      expect(currCameraProps.roll === prevCameraProps.roll).toBe(true);
-      expect(currCameraProps.yaw === prevCameraProps.yaw).toBe(true);
-    };
-
     // Test logic after moving mouse past top of range
     const testMovePastTopOfRange: SimulatedEventLogic["run"] = ({
       eventHistory,
@@ -299,10 +280,29 @@ describe("VimeoCameraInputTracker", () => {
       const currCameraProps = eventHistory[eventHistory.length - 1].cameraProps;
       const prevCameraProps = eventHistory[eventHistory.length - 2].cameraProps;
 
-      expect(moveCameraSpy).toHaveBeenCalledTimes(2);
-      expect(setCameraPropsSpy).toHaveBeenCalledTimes(2);
+      expect(moveCameraSpy).toHaveBeenCalledTimes(1);
+      expect(setCameraPropsSpy).toHaveBeenCalledTimes(1);
       expect(currCameraProps.pitch).toBeGreaterThan(prevCameraProps.pitch);
       expect(currCameraProps.pitch).toBe(PITCH_RANGE.max);
+      expect(currCameraProps.fov === prevCameraProps.fov).toBe(true);
+      expect(currCameraProps.roll === prevCameraProps.roll).toBe(true);
+      expect(currCameraProps.yaw === prevCameraProps.yaw).toBe(true);
+    };
+
+    // Test logic after moving mouse past bottom of range
+    const testMovePastBottomOfRange: SimulatedEventLogic["run"] = ({
+      eventHistory,
+      moveCameraSpy,
+      setCameraPropsSpy,
+    }) => {
+      // Get camera props before and after mouse movement
+      const currCameraProps = eventHistory[eventHistory.length - 1].cameraProps;
+      const prevCameraProps = eventHistory[eventHistory.length - 2].cameraProps;
+
+      expect(moveCameraSpy).toHaveBeenCalledTimes(2);
+      expect(setCameraPropsSpy).toHaveBeenCalledTimes(2);
+      expect(currCameraProps.pitch).toBeLessThan(prevCameraProps.pitch);
+      expect(currCameraProps.pitch).toBe(PITCH_RANGE.min);
       expect(currCameraProps.fov === prevCameraProps.fov).toBe(true);
       expect(currCameraProps.roll === prevCameraProps.roll).toBe(true);
       expect(currCameraProps.yaw === prevCameraProps.yaw).toBe(true);
@@ -318,9 +318,9 @@ describe("VimeoCameraInputTracker", () => {
       },
       {
         description:
-          "camera should not move past bottom of allowable range on mouse move",
+          "camera should not move past top of allowable range on mouse move",
         type: "logic",
-        run: testMovePastBottomOfRange,
+        run: testMovePastTopOfRange,
       },
       {
         type: "mousemove",
@@ -329,9 +329,9 @@ describe("VimeoCameraInputTracker", () => {
       },
       {
         description:
-          "camera should not move past top of allowable range on mouse move",
+          "camera should not move past bottom of allowable range on mouse move",
         type: "logic",
-        run: testMovePastTopOfRange,
+        run: testMovePastBottomOfRange,
       },
     ];
 
@@ -475,7 +475,7 @@ describe("VimeoCameraInputTracker", () => {
         type: "logic",
         run: generateSetCameraPropsRunLogic({ yaw: YAW_RANGE.min + 1 }),
       },
-      { type: "mousemove", clientX: 5, clientY: 0 },
+      { type: "mousemove", clientX: -5, clientY: 0 },
       {
         description: "camera should move through yaw min to max on drag",
         type: "logic",

@@ -1,5 +1,3 @@
-
-(function(l, r) { if (!l || l.getElementById('livereloadscript')) return; r = l.createElement('script'); r.async = 1; r.src = '//' + (self.location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1'; r.id = 'livereloadscript'; l.getElementsByTagName('head')[0].appendChild(r) })(self.document);
 var bundle = (function (exports) {
     'use strict';
 
@@ -3610,9 +3608,13 @@ var bundle = (function (exports) {
         constructor(min, max, circular = false, current = null) {
             this._current = Infinity;
             if (min >= max)
-                throw new Error("min must be less than max");
+                throw new Error(`min must be less than max, received ${JSON.stringify({ min, max })}`);
             if (current !== null && (current < min || current > max))
-                throw new Error("current must be within range");
+                throw new Error(`current must be within range, received ${JSON.stringify({
+                current,
+                min,
+                max,
+            })}`);
             this.min = min;
             this.max = max;
             this.circular = circular;
@@ -3652,6 +3654,20 @@ var bundle = (function (exports) {
                 (jRange.max - jRange.min) +
                 jRange.min);
         };
+    };
+    /**
+     * Maps a position and width from one range to another.
+     *
+     * @param iRange - range to map from
+     * @param jCurrent - current value of range to map to
+     * @param jWidth - width of range to map to
+     * @returns - range mapped to
+     */
+    const mapPositionAndWidthToRange = (iRange, jCurrent, jWidth) => {
+        const percentRange = (iRange.current - iRange.min) / (iRange.max - iRange.min);
+        const jMin = jCurrent - jWidth * percentRange;
+        const jMax = jMin + jWidth;
+        return new MinMaxRange(jMin, jMax, iRange.circular, jCurrent);
     };
 
     // EXPORTS
@@ -3740,10 +3756,9 @@ var bundle = (function (exports) {
              */
             this.storeDragData = (xStart, yStart) => {
                 const { width, height } = this.element.getBoundingClientRect();
-                this.dragData = {
-                    xRange: new MinMaxRange(xStart - width * 0.25, xStart + width * 0.25, false, xStart),
-                    yRange: new MinMaxRange(yStart - height * 0.25, yStart + height * 0.25, false, yStart),
-                };
+                const xRange = mapPositionAndWidthToRange(YAW_RANGE, xStart, width / 2);
+                const yRange = mapPositionAndWidthToRange(PITCH_RANGE, yStart, height / 2);
+                this.dragData = { xRange, yRange };
             };
             /**
              * Handles mousedown events on the event overlay.
@@ -3768,11 +3783,9 @@ var bundle = (function (exports) {
                 const { xRange, yRange } = this.dragData;
                 xRange.current = event.clientX;
                 yRange.current = event.clientY;
-                const xTransform = generateRangeTransform(xRange, YAW_RANGE);
-                const yTransform = generateRangeTransform(yRange, PITCH_RANGE);
-                const nextYaw = xTransform(xRange.current);
-                const nextPitch = yTransform(yRange.current);
-                yield this.moveCamera(nextYaw, -nextPitch);
+                const nextYaw = generateRangeTransform(xRange, YAW_RANGE)(xRange.current);
+                const nextPitch = generateRangeTransform(yRange, PITCH_RANGE)(yRange.current);
+                yield this.moveCamera(nextYaw, nextPitch);
             });
             /**
              * Handles mouseup events on the event overlay.

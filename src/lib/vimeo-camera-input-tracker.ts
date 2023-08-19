@@ -1,5 +1,9 @@
 import { ExtendedPlayer } from "../types";
-import { MinMaxRange, generateRangeTransform } from "./range-operations";
+import {
+  MinMaxRange,
+  generateRangeTransform,
+  mapPositionAndWidthToRange,
+} from "./range-operations";
 import throttle from "./throttle";
 
 // CONSTANTS
@@ -111,20 +115,10 @@ class VimeoCameraInputTracker {
   storeDragData = (xStart: number, yStart: number): void => {
     const { width, height } = this.element.getBoundingClientRect();
 
-    this.dragData = {
-      xRange: new MinMaxRange(
-        xStart - width * 0.25,
-        xStart + width * 0.25,
-        false,
-        xStart
-      ),
-      yRange: new MinMaxRange(
-        yStart - height * 0.25,
-        yStart + height * 0.25,
-        false,
-        yStart
-      ),
-    };
+    const xRange = mapPositionAndWidthToRange(YAW_RANGE, xStart, width / 2);
+    const yRange = mapPositionAndWidthToRange(PITCH_RANGE, yStart, height / 2);
+
+    this.dragData = { xRange, yRange };
   };
 
   /**
@@ -156,13 +150,13 @@ class VimeoCameraInputTracker {
     xRange.current = event.clientX;
     yRange.current = event.clientY;
 
-    const xTransform = generateRangeTransform(xRange, YAW_RANGE);
-    const yTransform = generateRangeTransform(yRange, PITCH_RANGE);
+    const nextYaw = generateRangeTransform(xRange, YAW_RANGE)(xRange.current);
+    const nextPitch = generateRangeTransform(
+      yRange,
+      PITCH_RANGE
+    )(yRange.current);
 
-    const nextYaw = xTransform(xRange.current);
-    const nextPitch = yTransform(yRange.current);
-
-    await this.moveCamera(nextYaw, -nextPitch);
+    await this.moveCamera(nextYaw, nextPitch);
   };
 
   /**

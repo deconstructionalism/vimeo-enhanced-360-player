@@ -1,4 +1,8 @@
-import { MinMaxRange, generateRangeTransform } from "./range-operations";
+import {
+  MinMaxRange,
+  generateRangeTransform,
+  mapPositionAndWidthToRange,
+} from "./range-operations";
 
 // TESTS
 
@@ -88,4 +92,47 @@ describe("generateRangeTransform", () => {
     expect(transform2(180)).toBe(0);
     expect(transform2(360)).toBe(180);
   });
+});
+
+describe("mapPositionAndWidthToRange", () => {
+  test.each([
+    {
+      iRange: new MinMaxRange(0, 100, false, 20),
+      jCurrent: 80,
+      jWidth: 360,
+      expectedJMin: 8,
+      expectedJMax: 368,
+    },
+    {
+      iRange: new MinMaxRange(0, 100, true, 20),
+      jCurrent: 50,
+      jWidth: 360,
+      expectedJMin: -22,
+      expectedJMax: 338,
+    },
+    {
+      iRange: new MinMaxRange(-100, 100, false, -20),
+      jCurrent: -10,
+      jWidth: 360,
+      expectedJMin: -154,
+      expectedJMax: 206,
+    },
+    {
+      iRange: new MinMaxRange(-200, -100, true, -150),
+      jCurrent: 20,
+      jWidth: 360,
+      expectedJMin: -160,
+      expectedJMax: 200,
+    },
+  ])(
+    "maps a value with a width to a new range based on another range: %p",
+    ({ iRange, jCurrent, jWidth, expectedJMin, expectedJMax }) => {
+      const jRange = mapPositionAndWidthToRange(iRange, jCurrent, jWidth);
+
+      expect(jRange.current).toBe(jCurrent);
+      expect(iRange.circular).toBe(jRange.circular);
+      expect(jRange.min).toBe(expectedJMin);
+      expect(jRange.max).toBe(expectedJMax);
+    }
+  );
 });

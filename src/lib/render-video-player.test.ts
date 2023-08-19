@@ -98,7 +98,7 @@ describe("renderVideoPlayer", () => {
   it("uses camera input tracker if video is 360 and is a background enhanced video", async () => {
     // Create player and element using `renderVideoPlayer` that is in
     // enhanced background mode
-    await createPlayerAndElement(
+    const { element, player } = await createPlayerAndElement(
       {
         vimeoId: VIMEO_ID,
         vimeoBackground: "true",
@@ -107,7 +107,15 @@ describe("renderVideoPlayer", () => {
       true
     );
 
-    expect(VimeoCameraInputTracker).toHaveBeenCalled();
+    const { yaw, pitch } = await player.getCameraProps();
+
+    expect(VimeoCameraInputTracker).toHaveBeenCalledTimes(1);
+    expect(VimeoCameraInputTracker).toHaveBeenCalledWith(
+      element,
+      player,
+      yaw,
+      pitch
+    );
   });
 
   it("does not add full-width styles to non-responsive videos", async () => {

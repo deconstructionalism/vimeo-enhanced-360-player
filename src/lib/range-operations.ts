@@ -20,9 +20,18 @@ class MinMaxRange {
     circular = false,
     current: number | null = null
   ) {
-    if (min >= max) throw new Error("min must be less than max");
+    if (min >= max)
+      throw new Error(
+        `min must be less than max, received ${JSON.stringify({ min, max })}`
+      );
     if (current !== null && (current < min || current > max))
-      throw new Error("current must be within range");
+      throw new Error(
+        `current must be within range, received ${JSON.stringify({
+          current,
+          min,
+          max,
+        })}`
+      );
 
     this.min = min;
     this.max = max;
@@ -69,4 +78,25 @@ const generateRangeTransform = (iRange: MinMaxRange, jRange: MinMaxRange) => {
   };
 };
 
-export { MinMaxRange, generateRangeTransform };
+/**
+ * Maps a position and width from one range to another.
+ *
+ * @param iRange - range to map from
+ * @param jCurrent - current value of range to map to
+ * @param jWidth - width of range to map to
+ * @returns - range mapped to
+ */
+const mapPositionAndWidthToRange = (
+  iRange: MinMaxRange,
+  jCurrent: number,
+  jWidth: number
+): MinMaxRange => {
+  const percentRange =
+    (iRange.current - iRange.min) / (iRange.max - iRange.min);
+  const jMin = jCurrent - jWidth * percentRange;
+  const jMax = jMin + jWidth;
+
+  return new MinMaxRange(jMin, jMax, iRange.circular, jCurrent);
+};
+
+export { MinMaxRange, generateRangeTransform, mapPositionAndWidthToRange };
